@@ -1,0 +1,9 @@
+project_name = "startlinker"
+environment = "production"
+region = "us-east-1"
+availability_zone = "us-east-1a"
+db_username = "startlinker"
+db_password = "StartLinker2024!SecureDB"
+django_secret_key = "django-insecure-fresh-secret-key-2024-production-startlinker-hub-app"
+enable_free_tier_only = true
+domain_name = "startlinker.com"

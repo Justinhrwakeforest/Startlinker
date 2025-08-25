@@ -1,0 +1,168 @@
+{
+  "timestamp": "2025-08-21T12:27:58.262120",
+  "overall_score": 58,
+  "security_issues": [
+    {
+      "severity": "critical",
+      "category": "security",
+      "title": "Default SECRET_KEY",
+      "description": "Using default Django SECRET_KEY in production",
+      "recommendation": null
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "title": "DEBUG Mode Enabled",
+      "description": "DEBUG=True in production environment",
+      "recommendation": null
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "title": "HTTPS Redirect Disabled",
+      "description": "SECURE_SSL_REDIRECT is False",
+      "recommendation": null
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "title": "Insecure CSRF Cookies",
+      "description": "CSRF_COOKIE_SECURE is False",
+      "recommendation": null
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "title": "Outdated Dependencies",
+      "description": "Some packages have newer versions available",
+      "recommendation": null
+    },
+    {
+      "severity": "low",
+      "category": "security",
+      "title": "Missing File: startup_hub/startup_hub/settings.py",
+      "description": "File not found",
+      "recommendation": null
+    },
+    {
+      "severity": "low",
+      "category": "security",
+      "title": "Missing File: startup_hub/startup_hub/settings/production.py",
+      "description": "File not found",
+      "recommendation": null
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "title": "XSS Protection Missing",
+      "description": "SECURE_BROWSER_XSS_FILTER setting not found",
+      "recommendation": null
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "title": "Missing Middleware: startup_hub.middleware.SecurityHeadersMiddleware",
+      "description": "Security middleware not configured",
+      "recommendation": null
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "title": "Missing Middleware: startup_hub.middleware.RateLimitMiddleware",
+      "description": "Security middleware not configured",
+      "recommendation": null
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "title": "Missing Middleware: startup_hub.middleware.SecurityMonitoringMiddleware",
+      "description": "Security middleware not configured",
+      "recommendation": null
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "title": "File Type Restrictions Missing",
+      "description": "No file type restrictions configured",
+      "recommendation": null
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "title": "Insecure Session Cookies",
+      "description": "Session cookies not marked as secure",
+      "recommendation": null
+    },
+    {
+      "severity": "low",
+      "category": "security",
+      "title": "Missing Environment Variable: SECRET_KEY",
+      "description": "Environment variable SECRET_KEY not found",
+      "recommendation": null
+    },
+    {
+      "severity": "low",
+      "category": "security",
+      "title": "Missing Environment Variable: STRIPE_SECRET_KEY",
+      "description": "Environment variable STRIPE_SECRET_KEY not found",
+      "recommendation": null
+    },
+    {
+      "severity": "low",
+      "category": "security",
+      "title": "Missing Environment Variable: AWS_SECRET_ACCESS_KEY",
+      "description": "Environment variable AWS_SECRET_ACCESS_KEY not found",
+      "recommendation": null
+    },
+    {
+      "severity": "low",
+      "category": "security",
+      "title": "Missing Environment Variable: DATABASE_URL",
+      "description": "Environment variable DATABASE_URL not found",
+      "recommendation": null
+    },
+    {
+      "severity": "low",
+      "category": "security",
+      "title": "Missing Environment Variable: EMAIL_HOST_PASSWORD",
+      "description": "Environment variable EMAIL_HOST_PASSWORD not found",
+      "recommendation": null
+    },
+    {
+      "severity": "low",
+      "category": "security",
+      "title": "Missing Frontend File: frontend/src/config/axios.js",
+      "description": "Frontend configuration file not found",
+      "recommendation": null
+    },
+    {
+      "severity": "low",
+      "category": "security",
+      "title": "Missing Frontend File: frontend/src/config/api.config.js",
+      "description": "Frontend configuration file not found",
+      "recommendation": null
+    }
+  ],
+  "functionality_issues": [],
+  "recommendations": [
+    "CRITICAL: Address all critical security issues immediately",
+    "HIGH: Fix high-priority security vulnerabilities",
+    "MEDIUM: Review and fix medium-priority issues",
+    "Enable HTTPS for all communications",
+    "Implement proper session management",
+    "Use strong, unique passwords for all accounts",
+    "Regularly update dependencies",
+    "Implement proper logging and monitoring",
+    "Conduct regular security audits",
+    "Use environment variables for sensitive data",
+    "Implement proper input validation",
+    "Use Content Security Policy headers",
+    "Enable rate limiting on all endpoints"
+  ],
+  "tests_passed": 13,
+  "tests_failed": 20,
+  "critical_issues": 1,
+  "high_issues": 1,
+  "medium_issues": 9,
+  "low_issues": 9
+}

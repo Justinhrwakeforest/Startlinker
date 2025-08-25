@@ -1,0 +1,80 @@
+{
+  "timestamp": "2025-08-21T12:48:58.202420",
+  "tests_passed": 16,
+  "tests_failed": 10,
+  "functionality_issues": [
+    {
+      "severity": "critical",
+      "category": "auth",
+      "title": "Authentication System Error",
+      "description": "Error testing authentication: UNIQUE constraint failed: users_user.email",
+      "recommendation": null
+    },
+    {
+      "severity": "critical",
+      "category": "upload",
+      "title": "File Upload System Error",
+      "description": "Error testing file upload: name 'User' is not defined",
+      "recommendation": null
+    },
+    {
+      "severity": "medium",
+      "category": "api",
+      "title": "Health Check Failed",
+      "description": "Health check returned status 400",
+      "recommendation": null
+    },
+    {
+      "severity": "medium",
+      "category": "api",
+      "title": "User Registration API Failed",
+      "description": "Registration API returned status 400",
+      "recommendation": null
+    },
+    {
+      "severity": "medium",
+      "category": "api",
+      "title": "User Login API Failed",
+      "description": "Login API returned status 400",
+      "recommendation": null
+    },
+    {
+      "severity": "critical",
+      "category": "business",
+      "title": "Business Logic Error",
+      "description": "Error testing business logic: no such table: main.auth_user",
+      "recommendation": null
+    },
+    {
+      "severity": "critical",
+      "category": "database",
+      "title": "Database Operations Error",
+      "description": "Error testing database operations: name 'User' is not defined",
+      "recommendation": null
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "title": "CSRF Protection",
+      "description": "CSRF protection may not be working",
+      "recommendation": null
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "title": "Authentication Required",
+      "description": "Authentication not properly enforced",
+      "recommendation": null
+    },
+    {
+      "severity": "medium",
+      "category": "performance",
+      "title": "Performance Test Error",
+      "description": "Error testing performance: name 'User' is not defined",
+      "recommendation": null
+    }
+  ],
+  "api_tests": [],
+  "user_tests": [],
+  "business_logic_tests": []
+}

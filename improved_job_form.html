@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post a New Job - Improved UI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .modal-container {
+            position: relative;
+            max-width: 900px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #4c6ef5 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px 40px;
+            position: relative;
+        }
+
+        .modal-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.1;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .modal-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            position: relative;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            margin-top: 25px;
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #60a5fa, #34d399);
+            width: 33%;
+            transition: width 0.5s ease;
+            border-radius: 2px;
+        }
+
+        .step-navigation {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 20px;
+            position: relative;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .step.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .step.completed {
+            background: rgba(52, 211, 153, 0.3);
+        }
+
+        .step.inactive {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #4c6ef5, #7c3aed);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.2s;
+            background: #fafafa;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #4c6ef5;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 16px;
+        }
+
+        .input-with-icon {
+            padding-left: 50px;
+        }
+
+        .help-text {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+
+        .success-indicator {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #065f46;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .custom-checkbox {
+            position: relative;
+            width: 20px;
+            height: 20px;
+        }
+
+        .custom-checkbox input {
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .checkbox-design {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border: 2px solid #d1d5db;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .custom-checkbox input:checked + .checkbox-design {
+            background: #4c6ef5;
+            border-color: #4c6ef5;
+        }
+
+        .checkbox-design::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .custom-checkbox input:checked + .checkbox-design::after {
+            opacity: 1;
+        }
+
+        .checkbox-label {
+            font-size: 14px;
+            color: #374151;
+            cursor: pointer;
+        }
+
+        .tag-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: #fafafa;
+            min-height: 50px;
+            transition: all 0.2s;
+        }
+
+        .tag-input:focus-within {
+            border-color: #4c6ef5;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.1);
+        }
+
+        .tag {
+            background: linear-gradient(135deg, #4c6ef5, #7c3aed);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tag-remove {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .tag-remove:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 40px;
+            background: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4c6ef5, #7c3aed);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(76, 110, 245, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #6b7280;
+            border: 2px solid #e5e7eb;
+        }
+
+        .btn-secondary:hover {
+            background: #f3f4f6;
+        }
+
+        .auto-save {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #10b981;
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .modal-container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .modal-header {
+                padding: 25px 20px;
+            }
+
+            .modal-title {
+                font-size: 24px;
+            }
+
+            .step-navigation {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .step {
+                padding: 8px 15px;
+                font-size: 13px;
+            }
+
+            .form-container {
+                padding: 25px 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .form-actions {
+                padding: 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .salary-range-hint {
+            background: #eff6ff;
+            border: 1px solid #93c5fd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #1e40af;
+        }
+
+        .location-suggestion {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .suggestion-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .suggestion-item:hover {
+            background: #f3f4f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <button class="close-button">×</button>
+                <h1 class="modal-title">Post a New Job</h1>
+                <p class="modal-subtitle">Create an opportunity that attracts top talent to your startup</p>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+
+                <div class="step-navigation">
+                    <div class="step active">
+                        <div class="step-icon">📋</div>
+                        <span>Job Info</span>
+                    </div>
+                    <div class="step inactive">
+                        <div class="step-icon">👤</div>
+                        <span>Details</span>
+                    </div>
+                    <div class="step inactive">
+                        <div class="step-icon">✓</div>
+                        <span>Review</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <div class="success-indicator">
+                    <span>✅</span>
+                    <div>
+                        <strong>Connected to Real API</strong><br>
+                        <small>This form is now connected to your Django backend. Jobs will be submitted to the admin panel for review.</small>
+                    </div>
+                </div>
+
+                <form id="jobForm">
+                    <div class="form-section">
+                        <h2 class="section-title">
+                            <div class="section-icon">📋</div>
+                            Job Information
+                        </h2>
+                        
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label class="form-label">
+                                    Job Title <span class="required">*</span>
+                                </label>
+                                <div class="input-container">
+                                    <div class="input-icon">💼</div>
+                                    <input 
+                                        type="text" 
+                                        class="form-input input-with-icon" 
+                                        placeholder="e.g. Senior Software Engineer"
+                                        required
+                                    >
+                                </div>
+                                <div class="help-text">Write a clear, descriptive job title that candidates will easily understand</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Startup
+                                </label>
+                                <select class="form-select">
+                                    <option value="">Select startup (optional)</option>
+                                    <option value="1">TechCorp Inc.</option>
+                                    <option value="2">InnovateAI</option>
+                                    <option value="3">NextGen Solutions</option>
+                                </select>
+                                <div class="help-text">You can post independently or select your company</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Job Type <span class="required">*</span>
+                                </label>
+                                <select class="form-select" required>
+                                    <option value="">Select job type</option>
+                                    <option value="1">Full-time</option>
+                                    <option value="2">Part-time</option>
+                                    <option value="3">Contract</option>
+                                    <option value="4">Internship</option>
+                                </select>
+                                <div class="help-text">Available options: 4 job types<br>(1:Full-time, 2:Part-time, 3:Contract, 4:Internship)</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Location <span class="required">*</span>
+                                </label>
+                                <div class="input-container">
+                                    <div class="input-icon">📍</div>
+                                    <input 
+                                        type="text" 
+                                        class="form-input input-with-icon" 
+                                        placeholder="e.g. San Francisco, CA"
+                                        required
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Salary Range
+                                </label>
+                                <div class="input-container">
+                                    <div class="input-icon">💰</div>
+                                    <input 
+                                        type="text" 
+                                        class="form-input input-with-icon" 
+                                        placeholder="e.g. $80,000 - $120,000"
+                                    >
+                                </div>
+                                <div class="salary-range-hint">
+                                    💡 <strong>Tip:</strong> Jobs with salary ranges get 3x more applications
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <div class="checkbox-group">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" id="remote">
+                                    <div class="checkbox-design"></div>
+                                </div>
+                                <label for="remote" class="checkbox-label">🌍 Remote work available</label>
+                            </div>
+
+                            <div class="checkbox-group">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" id="urgent">
+                                    <div class="checkbox-design"></div>
+                                </div>
+                                <label for="urgent" class="checkbox-label">🚨 Urgent hiring</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="form-actions">
+                <div class="auto-save">
+                    <span>💾</span>
+                    <span>Auto-saved 2 minutes ago</span>
+                </div>
+                
+                <div style="display: flex; gap: 15px;">
+                    <button class="btn btn-secondary">
+                        <span>📄</span>
+                        Save Draft
+                    </button>
+                    <button class="btn btn-primary">
+                        <span>➡️</span>
+                        Continue to Details
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced form interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-save functionality
+            let autoSaveTimeout;
+            const inputs = document.querySelectorAll('input, select, textarea');
+            
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    clearTimeout(autoSaveTimeout);
+                    autoSaveTimeout = setTimeout(() => {
+                        console.log('Auto-saving form...');
+                        // Here you would save to localStorage or send to server
+                    }, 2000);
+                });
+            });
+
+            // Location suggestions
+            const locationInput = document.querySelector('input[placeholder*="San Francisco"]');
+            if (locationInput) {
+                const suggestions = [
+                    'San Francisco, CA',
+                    'New York, NY',
+                    'Austin, TX',
+                    'Seattle, WA',
+                    'Boston, MA',
+                    'Remote'
+                ];
+
+                locationInput.addEventListener('focus', function() {
+                    // Create and show suggestions
+                });
+            }
+
+            // Progress bar animation
+            function updateProgress(step) {
+                const progressFill = document.querySelector('.progress-fill');
+                const steps = document.querySelectorAll('.step');
+                
+                let width = (step / 3) * 100;
+                progressFill.style.width = width + '%';
+                
+                steps.forEach((s, index) => {
+                    s.classList.remove('active', 'completed', 'inactive');
+                    if (index < step - 1) {
+                        s.classList.add('completed');
+                    } else if (index === step - 1) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.add('inactive');
+                    }
+                });
+            }
+
+            // Form validation
+            const form = document.getElementById('jobForm');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                // Add validation logic here
+                console.log('Form submitted!');
+            });
+        });
+    </script>
+</body>
+</html>

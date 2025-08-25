@@ -1,0 +1,83 @@
+{
+  "timestamp": "2025-08-22T16:07:56.354359",
+  "tests_run": 14,
+  "tests_passed": 8,
+  "tests_failed": 6,
+  "features": {
+    "Authentication": {
+      "passed": [],
+      "failed": [
+        {
+          "test": "User Registration",
+          "error": "Status: 404, Response: <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">\n  <title>Page not found at /api/users/register/</title>\n  <meta name=\"robots\" content=\"NON"
+        },
+        {
+          "test": "User Login",
+          "error": "Status: 404"
+        },
+        {
+          "test": "Token Authentication",
+          "error": "Status: 404"
+        },
+        {
+          "test": "Password Reset Request",
+          "error": "Status: 404"
+        }
+      ],
+      "errors": []
+    },
+    "Performance": {
+      "passed": [
+        {
+          "test": "Job Listings Response Time",
+          "details": "79.86ms"
+        },
+        {
+          "test": "Startups Directory Response Time",
+          "details": "106.69ms"
+        }
+      ],
+      "failed": [
+        {
+          "test": "User Profile Response Time",
+          "error": "Failed with status 404"
+        },
+        {
+          "test": "Posts Feed Response Time",
+          "error": "Failed with status 404"
+        }
+      ],
+      "errors": []
+    },
+    "Frontend": {
+      "passed": [
+        {
+          "test": "Home Page Accessibility",
+          "details": "Page accessible"
+        },
+        {
+          "test": "Login Page Accessibility",
+          "details": "Page accessible"
+        },
+        {
+          "test": "Register Page Accessibility",
+          "details": "Page accessible"
+        },
+        {
+          "test": "Jobs Page Accessibility",
+          "details": "Page accessible"
+        },
+        {
+          "test": "Startups Page Accessibility",
+          "details": "Page accessible"
+        },
+        {
+          "test": "Social Dashboard Accessibility",
+          "details": "Page accessible"
+        }
+      ],
+      "failed": [],
+      "errors": []
+    }
+  }
+}

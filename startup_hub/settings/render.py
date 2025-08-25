@@ -12,8 +12,10 @@ DEBUG = False
 # Get secret key from environment
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-# Allow Render hostnames
+# Allow Render hostnames and custom domain
 ALLOWED_HOSTS = [
+    'startlinker.com',
+    'www.startlinker.com',
     '.onrender.com',
     'startlinker-backend.onrender.com', 
     'startlinker.onrender.com',
@@ -51,6 +53,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # CORS settings - updated for our deployment
 CORS_ALLOWED_ORIGINS = [
+    "https://startlinker.com",
+    "https://www.startlinker.com", 
     "https://startlinker.onrender.com",
     "https://startlinker-frontend.onrender.com",
     "http://localhost:3000",
@@ -65,6 +69,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 # CSRF trusted origins
 CSRF_TRUSTED_ORIGINS = [
+    "https://startlinker.com",
+    "https://www.startlinker.com",
     "https://startlinker.onrender.com",
     "https://startlinker-frontend.onrender.com", 
     "https://startlinker-backend.onrender.com",

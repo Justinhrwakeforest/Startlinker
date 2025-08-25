@@ -1,12 +1,12 @@
 databases:
-  - name: startup-hub-db
-    databaseName: startup_hub_db
-    user: startup_hub_user
+  - name: startlinker-db
+    databaseName: startlinker_db
+    user: startlinker_user
     plan: free
 
 services:
   - type: web
-    name: startup-hub-backend
+    name: startlinker-backend
     env: python
     plan: free
     buildCommand: "pip install --upgrade pip && pip install -r requirements.txt && python manage.py collectstatic --noinput --clear"
@@ -21,10 +21,10 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: ALLOWED_HOSTS
-        value: ".onrender.com,startup-hub-backend.onrender.com"
+        value: ".onrender.com,startlinker-backend.onrender.com"
       - key: CORS_ALLOWED_ORIGINS
-        value: "https://startup-hub-frontend.onrender.com"
+        value: "https://startlinker-frontend.onrender.com"
       - key: DATABASE_URL
         fromDatabase:
-          name: startup-hub-db
+          name: startlinker-db
           property: connectionString

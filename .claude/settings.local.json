@@ -62,7 +62,12 @@
       "Bash(./venv/Scripts/python.exe:*)",
       "Bash(timeout:*)",
       "Read(/C:\\Users\\hruth/**)",
+<<<<<<< HEAD
       "Read(/C:\\Users\\hruth/**)"
+=======
+      "Read(/C:\\Users\\hruth/**)",
+      "Bash(git filter-branch:*)"
+>>>>>>> 05537c85e9b08f6948b899925f74f10b75caceaf
     ],
     "deny": [],
     "additionalDirectories": [
@@ -70,7 +75,12 @@
       "C:\\mnt\\c\\Users\\hruth",
       "C:\\Users\\hruth\\frontend",
       "C:\\c\\Users\\hruth\\startup_hub",
+<<<<<<< HEAD
       "C:\\Users\\hruth\\Downloads"
+=======
+      "C:\\Users\\hruth\\Downloads",
+      "C:\\Users\\hruth"
+>>>>>>> 05537c85e9b08f6948b899925f74f10b75caceaf
     ]
   }
 }

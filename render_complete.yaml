@@ -1,0 +1,97 @@
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: startlinker-db
+    env: postgresql
+    plan: starter
+    databaseName: startlinker_db
+    user: startlinker_user
+
+  # Django Backend Service
+  - type: web
+    name: startlinker-backend
+    env: python
+    plan: starter
+    region: oregon
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput --clear
+      python manage.py migrate --noinput
+    startCommand: |
+      python manage.py migrate --noinput
+      gunicorn startup_hub.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --timeout 120
+    healthCheckPath: /api/health/
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+      - key: DJANGO_SETTINGS_MODULE
+        value: startup_hub.settings.production
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com,startlinker-backend.onrender.com,startlinker.onrender.com"
+      - key: CORS_ALLOWED_ORIGINS
+        value: "https://startlinker.onrender.com,https://startlinker-frontend.onrender.com"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromService:
+          type: pserv
+          name: startlinker-db
+          property: connectionString
+      - key: REDIS_URL
+        value: ""
+      - key: SECURE_SSL_REDIRECT
+        value: "True"
+      - key: SECURE_PROXY_SSL_HEADER
+        value: "HTTP_X_FORWARDED_PROTO,https"
+
+  # React Frontend Service
+  - type: web
+    name: startlinker-frontend
+    env: static
+    plan: starter
+    region: oregon
+    buildCommand: |
+      npm ci
+      npm run build
+    staticPublishPath: build
+    pullRequestPreviewsEnabled: false
+    buildFilter:
+      paths:
+        - frontend/**
+    envVars:
+      - key: NODE_VERSION
+        value: "18"
+      - key: REACT_APP_API_URL
+        value: "https://startlinker-backend.onrender.com"
+      - key: GENERATE_SOURCEMAP
+        value: "false"
+      - key: CI
+        value: "false"
+
+  # Optional: Background Worker (if you have background tasks)
+  - type: worker
+    name: startlinker-worker
+    env: python
+    plan: starter
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: |
+      python manage.py qcluster
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+      - key: DJANGO_SETTINGS_MODULE
+        value: startup_hub.settings.production
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        sync: false
+      - key: DATABASE_URL
+        fromService:
+          type: pserv
+          name: startlinker-db
+          property: connectionString

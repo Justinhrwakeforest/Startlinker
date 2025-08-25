@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Guide Button</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f0f0f0; 
+        }
+        .debug-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+        }
+        .error { border-left-color: #dc3545; }
+        .success { border-left-color: #28a745; }
+        .warning { border-left-color: #ffc107; }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover { background: #0056b3; }
+        .log {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .code {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Guide Button Debugger</h1>
+    
+    <div class="debug-box">
+        <h2>Current Status</h2>
+        <p>Use this page to debug why your Guide button isn't working.</p>
+    </div>
+
+    <div class="debug-box">
+        <h3>Step 1: Test Direct Guide Access</h3>
+        <p>First, let's verify the guide endpoint is working:</p>
+        <button class="btn" onclick="testGuideEndpoint()">Test Guide API</button>
+        <a href="/api/startups/guide/" class="btn" target="_blank">Open Guide Direct</a>
+        <div id="api-result" class="log" style="display: none;"></div>
+    </div>
+
+    <div class="debug-box">
+        <h3>Step 2: Find Your Guide Button</h3>
+        <button class="btn" onclick="findGuideButtons()">Scan for Guide Buttons</button>
+        <div id="button-scan" class="log" style="display: none;"></div>
+    </div>
+
+    <div class="debug-box">
+        <h3>Step 3: Debug Current Behavior</h3>
+        <button class="btn" onclick="addDebugListeners()">Add Debug to Guide Buttons</button>
+        <div id="debug-log" class="log" style="display: none;"></div>
+    </div>
+
+    <div class="debug-box warning">
+        <h3>Step 4: Quick Fix Options</h3>
+        <p>Copy and paste one of these solutions into your browser console:</p>
+        
+        <h4>Option A: Force Guide to Open in New Tab</h4>
+        <div class="code">
+document.querySelectorAll('*').forEach(el => {
+    if (el.textContent && el.textContent.includes('Guide')) {
+        el.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.open('/api/startups/guide/', '_blank');
+        };
+    }
+});
+        </div>
+
+        <h4>Option B: Replace Guide Button Link</h4>
+        <div class="code">
+document.querySelectorAll('a, button').forEach(el => {
+    if (el.textContent && el.textContent.includes('Guide')) {
+        if (el.tagName === 'A') {
+            el.href = '/api/startups/guide/';
+        } else {
+            el.onclick = () => window.location.href = '/api/startups/guide/';
+        }
+    }
+});
+        </div>
+    </div>
+
+    <div class="debug-box success">
+        <h3>Step 5: Permanent Fix</h3>
+        <p>Once you identify the issue, update your frontend code:</p>
+        <div class="code">
+&lt;!-- Change this --&gt;
+&lt;button onclick="someFunction()"&gt;Guide&lt;/button&gt;
+
+&lt;!-- To this --&gt;
+&lt;a href="/api/startups/guide/" target="_blank"&gt;Guide&lt;/a&gt;
+        </div>
+    </div>
+
+    <div id="console-output" class="debug-box">
+        <h3>Debug Output</h3>
+        <div id="output" class="log">Click the buttons above to start debugging...</div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'red' : type === 'success' ? 'green' : type === 'warning' ? 'orange' : 'black';
+            output.innerHTML += `<span style="color: ${color};">[${timestamp}] ${message}</span>\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        async function testGuideEndpoint() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.style.display = 'block';
+            
+            log('Testing guide endpoint...', 'info');
+            
+            try {
+                // Test JSON API
+                const jsonResponse = await fetch('/api/startups/guide/');
+                const jsonData = await jsonResponse.json();
+                
+                log('✅ JSON API working: ' + jsonData.title, 'success');
+                resultDiv.innerHTML = `<strong>API Response:</strong>\nStatus: ${jsonResponse.status}\nTitle: ${jsonData.title}\nContent Length: ${jsonData.content.length} chars`;
+                
+                // Test HTML version
+                const htmlResponse = await fetch('/api/startups/guide/', {
+                    headers: { 'Accept': 'text/html' }
+                });
+                
+                if (htmlResponse.ok) {
+                    log('✅ HTML version also working', 'success');
+                } else {
+                    log('⚠️ HTML version not working', 'warning');
+                }
+                
+            } catch (error) {
+                log('❌ Guide endpoint failed: ' + error.message, 'error');
+                resultDiv.innerHTML = `<strong>Error:</strong>\n${error.message}`;
+            }
+        }
+
+        function findGuideButtons() {
+            const scanDiv = document.getElementById('button-scan');
+            scanDiv.style.display = 'block';
+            
+            log('Scanning for Guide buttons...', 'info');
+            
+            const allElements = document.querySelectorAll('*');
+            const guideElements = [];
+            
+            allElements.forEach((el, index) => {
+                const text = el.textContent || el.innerText || '';
+                if (text.toLowerCase().includes('guide') && el.offsetHeight > 0) {
+                    guideElements.push({
+                        element: el,
+                        tagName: el.tagName,
+                        text: text.trim(),
+                        href: el.href || 'none',
+                        onclick: el.onclick ? 'has onclick' : 'no onclick',
+                        classes: el.className || 'no classes'
+                    });
+                }
+            });
+            
+            if (guideElements.length === 0) {
+                log('❌ No Guide buttons found on this page', 'warning');
+                scanDiv.innerHTML = 'No Guide buttons found. This debug page doesn\'t contain your actual startup page.';
+                return;
+            }
+            
+            log(`✅ Found ${guideElements.length} Guide-related elements`, 'success');
+            
+            let scanResult = 'Found Guide elements:\n\n';
+            guideElements.forEach((item, index) => {
+                scanResult += `${index + 1}. <${item.tagName.toLowerCase()}>\n`;
+                scanResult += `   Text: "${item.text.substring(0, 50)}..."\n`;
+                scanResult += `   Href: ${item.href}\n`;
+                scanResult += `   OnClick: ${item.onclick}\n`;
+                scanResult += `   Classes: ${item.classes}\n\n`;
+            });
+            
+            scanDiv.innerHTML = scanResult;
+        }
+
+        function addDebugListeners() {
+            const debugDiv = document.getElementById('debug-log');
+            debugDiv.style.display = 'block';
+            
+            log('Adding debug listeners to Guide buttons...', 'info');
+            
+            const elements = document.querySelectorAll('*');
+            let count = 0;
+            
+            elements.forEach(el => {
+                const text = el.textContent || '';
+                if (text.toLowerCase().includes('guide') && el.offsetHeight > 0) {
+                    count++;
+                    
+                    // Remove existing listeners
+                    const newEl = el.cloneNode(true);
+                    el.parentNode.replaceChild(newEl, el);
+                    
+                    // Add debug listener
+                    newEl.addEventListener('click', function(e) {
+                        log(`🔍 Guide button clicked: <${newEl.tagName}>`, 'info');
+                        log(`   Current href: ${newEl.href || 'none'}`, 'info');
+                        log(`   Preventing default action...`, 'warning');
+                        
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Open guide
+                        log('   Opening guide page...', 'success');
+                        window.open('/api/startups/guide/', '_blank');
+                        
+                        return false;
+                    });
+                }
+            });
+            
+            if (count > 0) {
+                log(`✅ Added debug listeners to ${count} elements`, 'success');
+                debugDiv.innerHTML = `Debug listeners added to ${count} Guide elements. Try clicking your Guide button now!`;
+            } else {
+                log('❌ No Guide buttons found to debug', 'warning');
+                debugDiv.innerHTML = 'No Guide buttons found on this page.';
+            }
+        }
+
+        // Auto-run basic tests
+        window.addEventListener('load', function() {
+            log('🚀 Debug page loaded', 'success');
+            log('Click the buttons above to debug your Guide button issue', 'info');
+            log('Or copy-paste the quick fixes into your browser console on the startup page', 'warning');
+        });
+    </script>
+</body>
+</html>

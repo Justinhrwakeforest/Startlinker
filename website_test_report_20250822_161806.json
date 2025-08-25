@@ -1,0 +1,247 @@
+{
+  "timestamp": "2025-08-22T16:17:52.296644",
+  "summary": {
+    "total_tests": 28,
+    "passed": 24,
+    "failed": 0,
+    "warnings": 4
+  },
+  "features": {
+    "Core API": {
+      "tests": [
+        {
+          "test": "Health Check",
+          "status": "PASS",
+          "details": "Backend is healthy",
+          "timestamp": "2025-08-22T16:17:52.304859"
+        },
+        {
+          "test": "API Statistics",
+          "status": "PASS",
+          "details": "Users: 35, Jobs: 99, Startups: 100",
+          "timestamp": "2025-08-22T16:17:52.363962"
+        }
+      ],
+      "passed": 2,
+      "failed": 0
+    },
+    "Authentication": {
+      "tests": [
+        {
+          "test": "User Registration",
+          "status": "PASS",
+          "details": "User created: testuser_1755859672",
+          "timestamp": "2025-08-22T16:17:53.053716"
+        }
+      ],
+      "passed": 1,
+      "failed": 0
+    },
+    "User Profile": {
+      "tests": [
+        {
+          "test": "Get Profile",
+          "status": "PASS",
+          "details": "Profile for testuser_1755859672",
+          "timestamp": "2025-08-22T16:17:53.113069"
+        },
+        {
+          "test": "Update Profile",
+          "status": "PASS",
+          "details": "Profile updated successfully",
+          "timestamp": "2025-08-22T16:17:57.291127"
+        },
+        {
+          "test": "Get User Stats",
+          "status": "PASS",
+          "details": "Stats retrieved",
+          "timestamp": "2025-08-22T16:17:57.344650"
+        }
+      ],
+      "passed": 3,
+      "failed": 0
+    },
+    "Social Features": {
+      "tests": [
+        {
+          "test": "Get Posts",
+          "status": "PASS",
+          "details": "Retrieved 0 posts",
+          "timestamp": "2025-08-22T16:17:57.389268"
+        },
+        {
+          "test": "Get Personalized Feed",
+          "status": "WARN",
+          "details": "Status: 404",
+          "timestamp": "2025-08-22T16:17:57.398234"
+        },
+        {
+          "test": "Get Suggested Users",
+          "status": "WARN",
+          "details": "Status: 404",
+          "timestamp": "2025-08-22T16:17:57.407045"
+        }
+      ],
+      "passed": 1,
+      "failed": 0
+    },
+    "Messaging": {
+      "tests": [
+        {
+          "test": "Get Conversations",
+          "status": "PASS",
+          "details": "Retrieved 0 conversations",
+          "timestamp": "2025-08-22T16:17:57.458440"
+        }
+      ],
+      "passed": 1,
+      "failed": 0
+    },
+    "Notifications": {
+      "tests": [
+        {
+          "test": "Get Notifications",
+          "status": "PASS",
+          "details": "Retrieved 0 notifications",
+          "timestamp": "2025-08-22T16:17:57.516631"
+        }
+      ],
+      "passed": 1,
+      "failed": 0
+    },
+    "Admin Features": {
+      "tests": [
+        {
+          "test": "Access Control",
+          "status": "WARN",
+          "details": "Unexpected status: 404",
+          "timestamp": "2025-08-22T16:17:57.524094"
+        }
+      ],
+      "passed": 0,
+      "failed": 0
+    },
+    "Job Board": {
+      "tests": [
+        {
+          "test": "Get Job Listings",
+          "status": "PASS",
+          "details": "Retrieved 20 jobs",
+          "timestamp": "2025-08-22T16:17:57.619467"
+        },
+        {
+          "test": "Job Search",
+          "status": "PASS",
+          "details": "Search functionality working",
+          "timestamp": "2025-08-22T16:17:57.839474"
+        },
+        {
+          "test": "Create Job Posting",
+          "status": "WARN",
+          "details": "Could not retrieve job types for testing",
+          "timestamp": "2025-08-22T16:17:57.885775"
+        }
+      ],
+      "passed": 2,
+      "failed": 0
+    },
+    "Startup Directory": {
+      "tests": [
+        {
+          "test": "Get Startup Listings",
+          "status": "PASS",
+          "details": "Retrieved 20 startups",
+          "timestamp": "2025-08-22T16:17:58.150516"
+        },
+        {
+          "test": "Startup Search",
+          "status": "PASS",
+          "details": "Search functionality working",
+          "timestamp": "2025-08-22T16:17:58.331243"
+        },
+        {
+          "test": "Submit Startup",
+          "status": "PASS",
+          "details": "Startup submitted: None",
+          "timestamp": "2025-08-22T16:18:06.651461"
+        }
+      ],
+      "passed": 3,
+      "failed": 0
+    },
+    "Frontend": {
+      "tests": [
+        {
+          "test": "Home Page",
+          "status": "PASS",
+          "details": "Page loads successfully",
+          "timestamp": "2025-08-22T16:18:06.654913"
+        },
+        {
+          "test": "Login Page",
+          "status": "PASS",
+          "details": "Page loads successfully",
+          "timestamp": "2025-08-22T16:18:06.658502"
+        },
+        {
+          "test": "Register Page",
+          "status": "PASS",
+          "details": "Page loads successfully",
+          "timestamp": "2025-08-22T16:18:06.678342"
+        },
+        {
+          "test": "Jobs Page",
+          "status": "PASS",
+          "details": "Page loads successfully",
+          "timestamp": "2025-08-22T16:18:06.694269"
+        },
+        {
+          "test": "Startups Page",
+          "status": "PASS",
+          "details": "Page loads successfully",
+          "timestamp": "2025-08-22T16:18:06.698866"
+        },
+        {
+          "test": "Social Dashboard",
+          "status": "PASS",
+          "details": "Page loads successfully",
+          "timestamp": "2025-08-22T16:18:06.727596"
+        },
+        {
+          "test": "Profile Page",
+          "status": "PASS",
+          "details": "Page loads successfully",
+          "timestamp": "2025-08-22T16:18:06.731036"
+        },
+        {
+          "test": "Messages Page",
+          "status": "PASS",
+          "details": "Page loads successfully",
+          "timestamp": "2025-08-22T16:18:06.757342"
+        },
+        {
+          "test": "About Page",
+          "status": "PASS",
+          "details": "Page loads successfully",
+          "timestamp": "2025-08-22T16:18:06.761511"
+        },
+        {
+          "test": "Help Page",
+          "status": "PASS",
+          "details": "Page loads successfully",
+          "timestamp": "2025-08-22T16:18:06.787934"
+        }
+      ],
+      "passed": 10,
+      "failed": 0
+    }
+  },
+  "critical_issues": [],
+  "warnings": [
+    "Social Features - Get Personalized Feed: Status: 404",
+    "Social Features - Get Suggested Users: Status: 404",
+    "Admin Features - Access Control: Unexpected status: 404",
+    "Job Board - Create Job Posting: Could not retrieve job types for testing"
+  ],
+  "recommendations": []
+}

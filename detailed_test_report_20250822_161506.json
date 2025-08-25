@@ -1,0 +1,112 @@
+{
+  "timestamp": "2025-08-22T16:15:04.699884",
+  "total_tests": 16,
+  "passed_tests": 13,
+  "failed_tests": 3,
+  "features": {
+    "Authentication": [
+      {
+        "test": "User Registration",
+        "success": true,
+        "details": "User testuser_1755859504 created",
+        "timestamp": "2025-08-22T16:15:05.343597"
+      },
+      {
+        "test": "User Login",
+        "success": false,
+        "details": "Status: 200",
+        "timestamp": "2025-08-22T16:15:05.787469"
+      }
+    ],
+    "Job Board": [
+      {
+        "test": "Get Job Listings",
+        "success": true,
+        "details": "Retrieved 20 jobs",
+        "timestamp": "2025-08-22T16:15:05.863198"
+      },
+      {
+        "test": "Create Job Posting",
+        "success": false,
+        "details": "Status: 401",
+        "timestamp": "2025-08-22T16:15:05.865557"
+      },
+      {
+        "test": "Search Jobs",
+        "success": true,
+        "details": "Search completed",
+        "timestamp": "2025-08-22T16:15:05.953228"
+      }
+    ],
+    "Startup Directory": [
+      {
+        "test": "Get Startup Listings",
+        "success": true,
+        "details": "Retrieved 20 startups",
+        "timestamp": "2025-08-22T16:15:06.071252"
+      },
+      {
+        "test": "Submit Startup",
+        "success": false,
+        "details": "Status: 401",
+        "timestamp": "2025-08-22T16:15:06.074702"
+      },
+      {
+        "test": "Search Startups",
+        "success": true,
+        "details": "Search completed",
+        "timestamp": "2025-08-22T16:15:06.129240"
+      }
+    ],
+    "Frontend": [
+      {
+        "test": "Home Page",
+        "success": true,
+        "details": "Page accessible",
+        "timestamp": "2025-08-22T16:15:06.149068"
+      },
+      {
+        "test": "Login Page",
+        "success": true,
+        "details": "Page accessible",
+        "timestamp": "2025-08-22T16:15:06.164553"
+      },
+      {
+        "test": "Register Page",
+        "success": true,
+        "details": "Page accessible",
+        "timestamp": "2025-08-22T16:15:06.168001"
+      },
+      {
+        "test": "Jobs Page",
+        "success": true,
+        "details": "Page accessible",
+        "timestamp": "2025-08-22T16:15:06.195708"
+      },
+      {
+        "test": "Startups Page",
+        "success": true,
+        "details": "Page accessible",
+        "timestamp": "2025-08-22T16:15:06.211633"
+      },
+      {
+        "test": "Social Dashboard",
+        "success": true,
+        "details": "Page accessible",
+        "timestamp": "2025-08-22T16:15:06.226034"
+      },
+      {
+        "test": "Profile Page",
+        "success": true,
+        "details": "Page accessible",
+        "timestamp": "2025-08-22T16:15:06.228711"
+      },
+      {
+        "test": "Messages Page",
+        "success": true,
+        "details": "Page accessible",
+        "timestamp": "2025-08-22T16:15:06.232869"
+      }
+    ]
+  }
+}

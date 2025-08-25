@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>StartLinker Login Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: 50px auto; padding: 20px; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { width: 100%; padding: 12px; background: #007cba; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #005a8b; }
+        .result { margin: 15px 0; padding: 10px; border-radius: 4px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h2>StartLinker Login Test</h2>
+    <p>Testing login directly to the server IP to bypass CSRF issues:</p>
+    
+    <form id="loginForm">
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" id="email" value="test@startlinker.com" required>
+        </div>
+        <div class="form-group">
+            <label>Password:</label>
+            <input type="password" id="password" value="Test@123456" required>
+        </div>
+        <button type="submit">Test Login</button>
+    </form>
+    
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('result');
+            
+            // Test multiple endpoints
+            const endpoints = [
+                'http://51.21.246.24/api/auth/login/',  // Direct IP (bypasses Cloudflare)
+                'https://startlinker.com/api/auth/login/' // Through domain
+            ];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    console.log(`Testing endpoint: ${endpoint}`);
+                    
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            email: email, 
+                            password: password,
+                            remember_me: false 
+                        }),
+                        mode: 'cors'
+                    });
+                    
+                    const responseText = await response.text();
+                    
+                    if (response.ok) {
+                        const data = JSON.parse(responseText);
+                        resultDiv.innerHTML = `
+                            <div class="result success">
+                                <strong>✅ Login Successful!</strong><br>
+                                Endpoint: ${endpoint}<br>
+                                Token: ${data.token ? data.token.substring(0, 20) + '...' : 'No token'}<br>
+                                User: ${data.user ? JSON.stringify(data.user) : 'No user data'}
+                            </div>
+                        `;
+                        return; // Success, stop trying other endpoints
+                    } else {
+                        console.log(`Failed ${endpoint}: ${response.status} - ${responseText.substring(0, 200)}`);
+                    }
+                } catch (error) {
+                    console.log(`Error ${endpoint}: ${error.message}`);
+                }
+            }
+            
+            // If all endpoints failed
+            resultDiv.innerHTML = `
+                <div class="result error">
+                    <strong>❌ All Login Attempts Failed</strong><br>
+                    The issue is CSRF protection blocking the requests.<br>
+                    <br>
+                    <strong>Solution needed:</strong><br>
+                    Add to Django settings.py:<br>
+                    <code>CSRF_TRUSTED_ORIGINS = ["https://startlinker.com"]</code>
+                </div>
+            `;
+        });
+    </script>
+</body>
+</html>

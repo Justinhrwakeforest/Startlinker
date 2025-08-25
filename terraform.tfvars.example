@@ -1,0 +1,17 @@
+# Terraform Variables for StartLinker AWS Deployment
+# Copy this file to terraform.tfvars and fill in your values
+
+# Database Configuration
+db_username = "startlinker_admin"
+db_password = "YourSecureDBPassword123!"  # Change this!
+
+# Django Configuration
+django_secret_key = "your-very-long-random-django-secret-key-at-least-50-chars"  # Generate a new one!
+
+# AWS Configuration
+region = "us-east-1"
+environment = "production"
+project_name = "startlinker"
+
+# Domain (optional - leave default if you don't have a domain)
+domain_name = "startlinker.com"

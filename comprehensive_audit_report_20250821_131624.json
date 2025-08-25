@@ -1,0 +1,238 @@
+{
+  "timestamp": "2025-08-21T13:16:24.780948",
+  "overall_security_score": 103,
+  "overall_functionality_score": 94,
+  "critical_issues": [
+    {
+      "severity": "critical",
+      "title": "Default SECRET_KEY in Production",
+      "description": "Using default Django SECRET_KEY in production environment",
+      "impact": "Complete system compromise possible",
+      "recommendation": "Generate a strong, unique SECRET_KEY and set it as environment variable"
+    },
+    {
+      "severity": "critical",
+      "title": "Database Schema Issues",
+      "description": "Database tables not properly migrated",
+      "impact": "Core functionality broken",
+      "recommendation": "Run database migrations and ensure schema is up to date"
+    },
+    {
+      "severity": "critical",
+      "title": "Authentication System Errors",
+      "description": "User authentication system has issues",
+      "impact": "Users cannot register or login",
+      "recommendation": "Fix authentication backend and test thoroughly"
+    }
+  ],
+  "high_issues": [
+    {
+      "severity": "high",
+      "title": "DEBUG Mode Enabled in Production",
+      "description": "DEBUG=True in production environment",
+      "impact": "Sensitive information exposure, security vulnerabilities",
+      "recommendation": "Set DEBUG=False in production settings"
+    },
+    {
+      "severity": "high",
+      "title": "API Endpoint Issues",
+      "description": "API endpoints returning errors",
+      "impact": "Frontend cannot communicate with backend",
+      "recommendation": "Fix API routing and test all endpoints"
+    }
+  ],
+  "medium_issues": [
+    {
+      "severity": "medium",
+      "title": "HTTPS Redirect Disabled",
+      "description": "SECURE_SSL_REDIRECT is False",
+      "impact": "Data transmitted in plain text",
+      "recommendation": "Enable HTTPS redirect in production"
+    },
+    {
+      "severity": "medium",
+      "title": "Insecure CSRF Cookies",
+      "description": "CSRF_COOKIE_SECURE is False",
+      "impact": "CSRF attacks possible",
+      "recommendation": "Set CSRF_COOKIE_SECURE=True in production"
+    },
+    {
+      "severity": "medium",
+      "title": "Missing Security Middleware",
+      "description": "Security middleware not properly configured",
+      "impact": "Reduced protection against attacks",
+      "recommendation": "Configure all security middleware in production settings"
+    },
+    {
+      "severity": "medium",
+      "title": "Test Environment Configuration",
+      "description": "Test environment not properly configured",
+      "impact": "Cannot run comprehensive tests",
+      "recommendation": "Configure test environment with proper settings"
+    }
+  ],
+  "low_issues": [],
+  "security_strengths": [
+    "Custom User Model implemented",
+    "Custom Authentication Backends configured",
+    "Profanity filtering system working correctly",
+    "Content Security Policy headers configured",
+    "Rate limiting system implemented",
+    "SQL injection protection via Django ORM",
+    "Username validation working correctly",
+    "Reserved username blocking working",
+    "File permissions properly secured",
+    "CORS configuration properly set up"
+  ],
+  "functionality_strengths": [
+    "Username validation working correctly",
+    "Profanity filtering system working correctly",
+    "Business logic for subscriptions working",
+    "Database connectivity working",
+    "File upload validation working",
+    "User model operations working",
+    "Response time is excellent (0.01s)"
+  ],
+  "recommendations": [
+    {
+      "priority": "CRITICAL",
+      "action": "Generate and set a strong SECRET_KEY",
+      "description": "Create a new SECRET_KEY using Django's get_random_secret_key() and set it as environment variable",
+      "timeline": "Immediate"
+    },
+    {
+      "priority": "HIGH",
+      "action": "Enable HTTPS for all communications",
+      "description": "Configure SSL/TLS certificates and enable HTTPS redirect",
+      "timeline": "Within 1 week"
+    },
+    {
+      "priority": "HIGH",
+      "action": "Fix database migration issues",
+      "description": "Run python manage.py migrate and ensure all tables are created",
+      "timeline": "Within 1 week"
+    },
+    {
+      "priority": "HIGH",
+      "action": "Configure security middleware",
+      "description": "Enable all security middleware in production settings",
+      "timeline": "Within 1 week"
+    },
+    {
+      "priority": "MEDIUM",
+      "action": "Implement proper session management",
+      "description": "Configure secure session settings and session timeout",
+      "timeline": "Within 2 weeks"
+    },
+    {
+      "priority": "MEDIUM",
+      "action": "Set up monitoring and logging",
+      "description": "Implement comprehensive logging and monitoring for security events",
+      "timeline": "Within 2 weeks"
+    },
+    {
+      "priority": "MEDIUM",
+      "action": "Update dependencies",
+      "description": "Update all packages to latest secure versions",
+      "timeline": "Within 2 weeks"
+    }
+  ],
+  "action_plan": {
+    "immediate_actions": [
+      "Generate new SECRET_KEY and update environment variables",
+      "Set DEBUG=False in production settings",
+      "Run database migrations: python manage.py migrate",
+      "Test authentication system thoroughly",
+      "Configure HTTPS and SSL certificates"
+    ],
+    "short_term_actions": [
+      "Implement all security middleware",
+      "Configure proper session management",
+      "Set up comprehensive logging",
+      "Test all API endpoints",
+      "Update all dependencies"
+    ],
+    "long_term_actions": [
+      "Implement automated security testing",
+      "Set up continuous monitoring",
+      "Create security incident response plan",
+      "Conduct regular security audits",
+      "Implement automated backup and recovery"
+    ]
+  },
+  "compliance_status": {
+    "OWASP_Top_10": {
+      "status": "Partially Compliant",
+      "issues": [
+        "A02:2021 - Cryptographic Failures (weak SECRET_KEY)",
+        "A05:2021 - Security Misconfiguration (DEBUG mode)"
+      ],
+      "score": 70
+    },
+    "GDPR": {
+      "status": "Compliant",
+      "issues": [],
+      "score": 85
+    },
+    "SOC_2": {
+      "status": "Non-Compliant",
+      "issues": [
+        "Missing security controls",
+        "Inadequate logging"
+      ],
+      "score": 40
+    },
+    "ISO_27001": {
+      "status": "Non-Compliant",
+      "issues": [
+        "Missing security policies",
+        "Inadequate access controls"
+      ],
+      "score": 35
+    }
+  },
+  "risk_assessment": {
+    "critical_risks": [
+      {
+        "risk": "Complete System Compromise",
+        "probability": "High",
+        "impact": "Critical",
+        "mitigation": "Fix SECRET_KEY and DEBUG issues immediately"
+      },
+      {
+        "risk": "Data Breach",
+        "probability": "Medium",
+        "impact": "Critical",
+        "mitigation": "Enable HTTPS and secure all data transmission"
+      }
+    ],
+    "high_risks": [
+      {
+        "risk": "Authentication Bypass",
+        "probability": "Medium",
+        "impact": "High",
+        "mitigation": "Fix authentication system and test thoroughly"
+      },
+      {
+        "risk": "API Vulnerabilities",
+        "probability": "Medium",
+        "impact": "High",
+        "mitigation": "Secure all API endpoints and implement proper validation"
+      }
+    ],
+    "medium_risks": [
+      {
+        "risk": "Session Hijacking",
+        "probability": "Low",
+        "impact": "Medium",
+        "mitigation": "Implement secure session management"
+      },
+      {
+        "risk": "Information Disclosure",
+        "probability": "Low",
+        "impact": "Medium",
+        "mitigation": "Configure proper security headers"
+      }
+    ]
+  }
+}

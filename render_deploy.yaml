@@ -1,0 +1,65 @@
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: startlinker-db
+    env: postgresql
+    plan: starter
+    databaseName: startlinker_db
+    user: startlinker_user
+
+  # Django Backend Service  
+  - type: web
+    name: startlinker-backend
+    env: python
+    plan: starter
+    region: oregon
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput --clear
+    startCommand: |
+      python manage.py migrate --noinput
+      gunicorn startup_hub.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    healthCheckPath: /admin/
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+      - key: DJANGO_SETTINGS_MODULE
+        value: startup_hub.settings.render
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com,startlinker-backend.onrender.com"
+      - key: CORS_ALLOWED_ORIGINS
+        value: "https://startlinker-frontend.onrender.com,https://startlinker.onrender.com"
+      - key: DATABASE_URL
+        fromService:
+          type: pserv
+          name: startlinker-db
+          property: connectionString
+
+  # React Frontend Static Site
+  - type: web
+    name: startlinker-frontend
+    env: static
+    plan: starter
+    region: oregon
+    buildCommand: |
+      cd frontend
+      npm ci --only=production
+      npm run build
+    staticPublishPath: frontend/build
+    pullRequestPreviewsEnabled: false
+    envVars:
+      - key: NODE_VERSION
+        value: "18"
+      - key: REACT_APP_API_URL
+        value: "https://startlinker-backend.onrender.com"
+      - key: GENERATE_SOURCEMAP
+        value: "false"
+      - key: CI
+        value: "false"
+      - key: BUILD_PATH
+        value: "build"

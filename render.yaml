@@ -28,19 +28,3 @@ services:
         fromDatabase:
           name: startlinker-db
           property: connectionString
-
-  - type: web
-    name: startlinker-frontend
-    env: static
-    plan: free
-    buildCommand: "cd ../frontend && npm ci && npm run build"
-    staticPublishPath: ../frontend/build
-    envVars:
-      - key: NODE_VERSION
-        value: 18
-      - key: REACT_APP_API_URL
-        value: https://startlinker-backend.onrender.com
-      - key: GENERATE_SOURCEMAP
-        value: false
-      - key: CI
-        value: false

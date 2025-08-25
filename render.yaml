@@ -1,57 +1,46 @@
-services:
-  # PostgreSQL Database
-  - type: pserv
-    name: startlinker-db
-    plan: free
+databases:
+  - name: startlinker-db
     databaseName: startlinker_db
     user: startlinker_user
+    plan: free
 
-  # Django Backend Service
+services:
   - type: web
     name: startlinker-backend
-    runtime: python
+    env: python
     plan: free
-    buildCommand: pip install --upgrade pip && pip install -r requirements.txt && python manage.py collectstatic --noinput --clear
-    startCommand: python manage.py migrate --noinput && gunicorn startup_hub.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt && python manage.py collectstatic --noinput --clear"
+    startCommand: "python manage.py migrate --noinput && gunicorn startup_hub.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
-        value: "3.11"
+        value: 3.11
       - key: DJANGO_SETTINGS_MODULE
         value: startup_hub.settings.render
       - key: DEBUG
-        value: "False"
+        value: false
       - key: SECRET_KEY
         generateValue: true
       - key: ALLOWED_HOSTS
-        value: ".onrender.com,startlinker-backend.onrender.com"
+        value: .onrender.com,startlinker-backend.onrender.com
       - key: CORS_ALLOWED_ORIGINS
-        value: "https://startlinker-frontend.onrender.com"
+        value: https://startlinker-frontend.onrender.com
       - key: DATABASE_URL
         fromDatabase:
           name: startlinker-db
           property: connectionString
 
-  # React Frontend Static Site  
   - type: web
     name: startlinker-frontend
-    runtime: static
+    env: static
     plan: free
-    buildCommand: cd ../frontend && npm ci && npm run build
+    buildCommand: "cd ../frontend && npm ci && npm run build"
     staticPublishPath: ../frontend/build
-    headers:
-      - path: /*
-        name: X-Frame-Options
-        value: SAMEORIGIN
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
     envVars:
       - key: NODE_VERSION
-        value: "18"
+        value: 18
       - key: REACT_APP_API_URL
-        value: "https://startlinker-backend.onrender.com"
+        value: https://startlinker-backend.onrender.com
       - key: GENERATE_SOURCEMAP
-        value: "false"
+        value: false
       - key: CI
-        value: "false"
+        value: false

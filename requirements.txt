@@ -15,4 +15,3 @@ dj-database-url==2.1.0
 channels==4.0.0
 channels-redis==4.1.0
 sendgrid==6.10.0
-sendgrid-django==1.1.0

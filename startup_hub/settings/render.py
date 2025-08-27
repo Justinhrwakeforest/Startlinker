@@ -134,7 +134,7 @@ LOGGING = {
 # SendGrid Email Configuration for Render
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
 if SENDGRID_API_KEY:
-    EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
+    EMAIL_BACKEND = 'apps.users.sendgrid_backend.SendGridBackend'
     DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@startlinker.com')
     EMAIL_HOST_USER = DEFAULT_FROM_EMAIL
     SENDGRID_SANDBOX_MODE_IN_DEBUG = False

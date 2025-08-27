@@ -80,7 +80,7 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 # SendGrid Email Configuration for Production
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')  # Set via environment variable
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@startlinker.com')
-EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'  # Use SendGrid backend for better performance
+EMAIL_BACKEND = 'apps.users.sendgrid_backend.SendGridBackend'  # Use SendGrid backend for better performance
 EMAIL_HOST_USER = DEFAULT_FROM_EMAIL
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False  # Always send emails in production
 

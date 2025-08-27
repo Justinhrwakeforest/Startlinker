@@ -44,23 +44,29 @@ class UserRegistrationView(generics.CreateAPIView):
             # Send email verification
             verification_sent = send_verification_email(user, request)
             
-            # Create auth token
-            token, created = Token.objects.get_or_create(user=user)
+            # Don't create token immediately - user must verify email first
+            # Only create token if email verification is disabled or for testing
+            include_token = settings.DEBUG or not getattr(settings, 'REQUIRE_EMAIL_VERIFICATION', True)
             
             # Track signup activity and award welcome points
             ActivityTracker.track_signup(user)
             
             response_data = {
                 'user': UserProfileSerializer(user).data,
-                'token': token.key,
-                'message': 'Account created successfully! You earned your first points!',
+                'message': 'Account created successfully!',
+                'email_verification_required': True,
                 'email_verification_sent': verification_sent
             }
             
+            # Only include token if email verification is not required
+            if include_token:
+                token, created = Token.objects.get_or_create(user=user)
+                response_data['token'] = token.key
+            
             if verification_sent:
-                response_data['verification_message'] = 'Please check your email to verify your account.'
+                response_data['verification_message'] = 'Please check your email to verify your account before logging in.'
             else:
-                response_data['verification_message'] = 'Account created, but verification email could not be sent. You can resend it later.'
+                response_data['verification_message'] = 'Account created, but verification email could not be sent. Please contact support.'
             
             return Response(response_data, status=status.HTTP_201_CREATED)
             
@@ -88,6 +94,19 @@ class UserLoginView(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         
+        # Check if email verification is required
+        require_verification = getattr(settings, 'REQUIRE_EMAIL_VERIFICATION', True)
+        
+        # In production, enforce email verification
+        if require_verification and not settings.DEBUG:
+            if not user.email_verified:
+                return Response({
+                    'error': 'Email not verified',
+                    'message': 'Please verify your email address before logging in.',
+                    'email': user.email,
+                    'email_verified': False
+                }, status=status.HTTP_403_FORBIDDEN)
+        
         # Create or get auth token
         token, created = Token.objects.get_or_create(user=user)
         
@@ -97,7 +116,8 @@ class UserLoginView(APIView):
         return Response({
             'user': UserProfileSerializer(user).data,
             'token': token.key,
-            'message': 'Login successful! Daily points awarded.'
+            'message': 'Login successful!',
+            'email_verified': user.email_verified
         })
 
 class UserLogoutView(APIView):

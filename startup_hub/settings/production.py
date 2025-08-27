@@ -92,6 +92,9 @@ EMAIL_VERIFICATION_SETTINGS = {
     'RESEND_COOLDOWN_MINUTES': 5,  # Minimum time between verification emails
 }
 
+# Enforce email verification in production
+REQUIRE_EMAIL_VERIFICATION = True
+
 # CORS settings for production
 CORS_ALLOWED_ORIGINS = [
     "https://startlinker.com",

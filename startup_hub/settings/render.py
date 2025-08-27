@@ -97,10 +97,30 @@ LOGGING = {
     },
 }
 
-# Email configuration (if needed)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+# SendGrid Email Configuration for Render
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
+if SENDGRID_API_KEY:
+    EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
+    DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@startlinker.com')
+    EMAIL_HOST_USER = DEFAULT_FROM_EMAIL
+    SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+else:
+    # Fallback email configuration
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+    DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# Email verification settings
+EMAIL_VERIFICATION_SETTINGS = {
+    'VERIFICATION_TOKEN_EXPIRY_HOURS': 24,
+    'FROM_EMAIL': DEFAULT_FROM_EMAIL,
+    'SUBJECT_PREFIX': '[StartLinker] ',
+    'RESEND_COOLDOWN_MINUTES': 5,
+}
+
+# Enforce email verification in production
+REQUIRE_EMAIL_VERIFICATION = True

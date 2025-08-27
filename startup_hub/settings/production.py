@@ -77,6 +77,21 @@ X_FRAME_OPTIONS = 'DENY'
 SECURE_REFERRER_POLICY = 'same-origin'
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 
+# SendGrid Email Configuration for Production
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')  # Set via environment variable
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@startlinker.com')
+EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'  # Use SendGrid backend for better performance
+EMAIL_HOST_USER = DEFAULT_FROM_EMAIL
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False  # Always send emails in production
+
+# Email verification settings
+EMAIL_VERIFICATION_SETTINGS = {
+    'VERIFICATION_TOKEN_EXPIRY_HOURS': 24,  # Token expires after 24 hours
+    'FROM_EMAIL': DEFAULT_FROM_EMAIL,
+    'SUBJECT_PREFIX': '[StartLinker] ',
+    'RESEND_COOLDOWN_MINUTES': 5,  # Minimum time between verification emails
+}
+
 # CORS settings for production
 CORS_ALLOWED_ORIGINS = [
     "https://startlinker.com",

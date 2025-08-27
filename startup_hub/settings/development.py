@@ -10,11 +10,15 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
-# Database
+# Database - PostgreSQL Configuration
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME', 'startup_hub'),
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
@@ -133,6 +137,21 @@ JOB_POSTING_SETTINGS = {
     'REQUIRE_REVIEW': True,  # Force all jobs to go through review
     'AUTO_APPROVE_STAFF': False,  # Even staff jobs require approval
     'AUTO_APPROVE_VERIFIED_STARTUPS': False,  # Even verified startups require approval
+}
+
+# SendGrid Email Configuration
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')  # Set via environment variable
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@startlinker.com')
+EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'  # Use SendGrid for email
+EMAIL_HOST_USER = DEFAULT_FROM_EMAIL
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False  # Disable sandbox mode to actually send emails
+
+# Email verification settings
+EMAIL_VERIFICATION_SETTINGS = {
+    'VERIFICATION_TOKEN_EXPIRY_HOURS': 24,  # Token expires after 24 hours
+    'FROM_EMAIL': DEFAULT_FROM_EMAIL,
+    'SUBJECT_PREFIX': '[StartLinker] ',
+    'RESEND_COOLDOWN_MINUTES': 5,  # Minimum time between verification emails
 }
 
 # Ensure required directories exist

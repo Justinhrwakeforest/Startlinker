@@ -18,6 +18,10 @@ from .activity_api_views import user_activity_feed
 from .resume_views import (
     resume_list_create, resume_detail, set_default_resume, get_default_resume
 )
+from .email_views import (
+    verify_email, resend_verification_email, send_verification_to_email, 
+    verification_status
+)
 
 urlpatterns = [
     path('register/', UserRegistrationView.as_view(), name='user-register'),
@@ -57,6 +61,12 @@ urlpatterns = [
     path('password-reset/', password_reset_request, name='password-reset-request'),
     path('password-reset/confirm/', password_reset_confirm, name='password-reset-confirm'),
     path('password-reset/verify/', verify_reset_token, name='verify-reset-token'),
+    
+    # Email verification endpoints
+    path('verify-email/', verify_email, name='verify-email'),
+    path('resend-verification/', resend_verification_email, name='resend-verification-email'),
+    path('send-verification/', send_verification_to_email, name='send-verification-to-email'),
+    path('verification-status/', verification_status, name='verification-status'),
     
     # Resume management endpoints
     path('resumes/', resume_list_create, name='resume-list-create'),

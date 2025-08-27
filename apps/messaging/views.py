@@ -1041,45 +1041,111 @@ def mark_messages_read(request):
     conversation_id = request.data.get('conversation_id')
     
     if conversation_id:
-        # Mark all messages in conversation as read
+        # Mark all unread messages in conversation as read
         messages = Message.objects.filter(
             conversation_id=conversation_id,
             conversation__participants=request.user
-        ).exclude(sender=request.user)
+        ).exclude(sender=request.user).exclude(
+            read_receipts__user=request.user  # Exclude already read messages
+        )
+        
+        marked_count = 0
+        last_message = None
         
         for message in messages:
             MessageRead.objects.get_or_create(
                 message=message,
                 user=request.user
             )
+            marked_count += 1
+            last_message = message
+        
+        # Get the actual last message in the conversation (not just unread)
+        all_messages = Message.objects.filter(
+            conversation_id=conversation_id,
+            conversation__participants=request.user
+        ).order_by('-sent_at').first()
         
         # Update participant's last read
-        participant = ConversationParticipant.objects.filter(
+        participant, created = ConversationParticipant.objects.get_or_create(
             conversation_id=conversation_id,
-            user=request.user
-        ).first()
+            user=request.user,
+            defaults={'joined_at': timezone.now()}
+        )
         
-        if participant:
-            participant.last_read_at = timezone.now()
-            participant.last_read_message = messages.last()
-            participant.save()
+        participant.last_read_at = timezone.now()
+        participant.last_read_message = all_messages  # Use the latest message overall
+        participant.save()
         
-        return Response({'message': f'{messages.count()} messages marked as read'})
+        # Send WebSocket notification for read receipts
+        try:
+            from channels.layers import get_channel_layer
+            from asgiref.sync import async_to_sync
+            
+            channel_layer = get_channel_layer()
+            if channel_layer:
+                async_to_sync(channel_layer.group_send)(
+                    f'conversation_{conversation_id}',
+                    {
+                        'type': 'read_receipt',
+                        'user_id': request.user.id,
+                        'conversation_id': str(conversation_id),
+                        'timestamp': timezone.now().isoformat()
+                    }
+                )
+        except Exception as e:
+            # Don't fail if WebSocket notification fails
+            pass
+        
+        return Response({
+            'message': f'{marked_count} messages marked as read',
+            'marked_count': marked_count,
+            'conversation_id': str(conversation_id)
+        })
     
     elif message_ids:
         # Mark specific messages as read
         messages = Message.objects.filter(
             id__in=message_ids,
             conversation__participants=request.user
+        ).exclude(
+            read_receipts__user=request.user  # Exclude already read messages
         )
+        
+        marked_count = 0
+        conversation_ids = set()
         
         for message in messages:
             MessageRead.objects.get_or_create(
                 message=message,
                 user=request.user
             )
+            marked_count += 1
+            conversation_ids.add(message.conversation_id)
         
-        return Response({'message': f'{messages.count()} messages marked as read'})
+        # Update last read for all affected conversations
+        for conv_id in conversation_ids:
+            participant, created = ConversationParticipant.objects.get_or_create(
+                conversation_id=conv_id,
+                user=request.user,
+                defaults={'joined_at': timezone.now()}
+            )
+            
+            last_msg = Message.objects.filter(
+                conversation_id=conv_id,
+                id__in=message_ids
+            ).order_by('-sent_at').first()
+            
+            if last_msg and (not participant.last_read_message or 
+                           last_msg.sent_at > participant.last_read_message.sent_at):
+                participant.last_read_message = last_msg
+                participant.last_read_at = timezone.now()
+                participant.save()
+        
+        return Response({
+            'message': f'{marked_count} messages marked as read',
+            'marked_count': marked_count
+        })
     
     return Response(
         {'error': 'Must provide either message_ids or conversation_id'},

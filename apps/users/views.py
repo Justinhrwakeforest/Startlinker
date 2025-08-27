@@ -27,6 +27,7 @@ from .serializers import (
 )
 from .models import User, UserInterest, UserSettings, Resume
 from .activity_tracker import ActivityTracker
+from .email_utils import send_verification_email
 
 class UserRegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -40,17 +41,28 @@ class UserRegistrationView(generics.CreateAPIView):
         try:
             user = serializer.save()
             
+            # Send email verification
+            verification_sent = send_verification_email(user, request)
+            
             # Create auth token
             token, created = Token.objects.get_or_create(user=user)
             
             # Track signup activity and award welcome points
             ActivityTracker.track_signup(user)
             
-            return Response({
+            response_data = {
                 'user': UserProfileSerializer(user).data,
                 'token': token.key,
-                'message': 'Account created successfully! You earned your first points!'
-            }, status=status.HTTP_201_CREATED)
+                'message': 'Account created successfully! You earned your first points!',
+                'email_verification_sent': verification_sent
+            }
+            
+            if verification_sent:
+                response_data['verification_message'] = 'Please check your email to verify your account.'
+            else:
+                response_data['verification_message'] = 'Account created, but verification email could not be sent. You can resend it later.'
+            
+            return Response(response_data, status=status.HTTP_201_CREATED)
             
         except IntegrityError as e:
             # Handle database integrity errors (like unique constraint violations)

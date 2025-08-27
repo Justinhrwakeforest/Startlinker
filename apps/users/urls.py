@@ -22,6 +22,10 @@ from .email_views import (
     verify_email, resend_verification_email, send_verification_to_email, 
     verification_status
 )
+from .admin_debug_views import (
+    debug_email_config, test_email_send, reset_email_cooldowns,
+    send_verification_debug, list_unverified_users
+)
 
 urlpatterns = [
     path('register/', UserRegistrationView.as_view(), name='user-register'),
@@ -82,4 +86,11 @@ urlpatterns = [
     path('<int:user_id>/achievements-summary/', user_achievements_summary, name='user-achievements-summary'),
     path('<int:user_id>/activity-feed/', user_activity_feed, name='user-activity-feed'),
     path('leaderboard/', achievements_leaderboard, name='achievements-leaderboard'),
+    
+    # Admin debug endpoints (REMOVE IN PRODUCTION!)
+    path('admin-debug/', debug_email_config, name='debug-email-config'),
+    path('admin-debug/test-email/', test_email_send, name='test-email-send'),
+    path('admin-debug/reset-cooldowns/', reset_email_cooldowns, name='reset-cooldowns'),
+    path('admin-debug/send-verification/', send_verification_debug, name='send-verification-debug'),
+    path('admin-debug/users/', list_unverified_users, name='list-unverified-users'),
 ]

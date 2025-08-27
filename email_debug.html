@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StartLinker Email Debug Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .success {
+            color: #28a745;
+            padding: 10px;
+            background: #d4edda;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .error {
+            color: #dc3545;
+            padding: 10px;
+            background: #f8d7da;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        input[type="email"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 300px;
+            margin: 5px;
+        }
+        pre {
+            background: #f1f1f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow: auto;
+            font-size: 12px;
+        }
+        .backend-url {
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 StartLinker Email Debug Tool</h1>
+            <p>Debug email verification without Shell access</p>
+            <p class="backend-url" id="backend-url">Backend: https://startlinker-backend.onrender.com</p>
+        </div>
+
+        <div class="section">
+            <h3>📊 Step 1: Check Email Configuration</h3>
+            <p>Check if SendGrid and environment variables are properly configured.</p>
+            <button onclick="checkEmailConfig()">Check Email Config</button>
+            <div id="config-result"></div>
+        </div>
+
+        <div class="section">
+            <h3>⏰ Step 2: Reset Email Cooldowns</h3>
+            <p>Reset rate limiting to allow sending verification emails again.</p>
+            <button onclick="resetCooldowns()">Reset All Cooldowns</button>
+            <div id="cooldown-result"></div>
+        </div>
+
+        <div class="section">
+            <h3>📧 Step 3: Test Email Sending</h3>
+            <p>Test if SendGrid can actually send emails.</p>
+            <input type="email" id="test-email" placeholder="Enter your email address">
+            <button onclick="testEmail()">Send Test Email</button>
+            <div id="test-email-result"></div>
+        </div>
+
+        <div class="section">
+            <h3>✉️ Step 4: Send Verification Email</h3>
+            <p>Send a fresh verification email to a specific user.</p>
+            <input type="email" id="verification-email" placeholder="Enter your email address">
+            <button onclick="sendVerification()">Send Verification Email</button>
+            <div id="verification-result"></div>
+        </div>
+
+        <div class="section">
+            <h3>👥 Step 5: List Unverified Users</h3>
+            <p>See which users need email verification.</p>
+            <button onclick="listUsers()">List Unverified Users</button>
+            <div id="users-result"></div>
+        </div>
+
+        <div class="section">
+            <h3>🎯 Instructions</h3>
+            <ol>
+                <li>Click "Check Email Config" to see if SendGrid is set up</li>
+                <li>Click "Reset All Cooldowns" to remove rate limiting</li>
+                <li>Enter your email and click "Send Test Email"</li>
+                <li>If test email works, try "Send Verification Email"</li>
+                <li>Check your inbox, spam, and promotions folder</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'https://startlinker-backend.onrender.com';
+        
+        async function makeRequest(url, method = 'GET', data = null) {
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            };
+            
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+            
+            try {
+                const response = await fetch(BACKEND_URL + url, options);
+                const result = await response.json();
+                return { success: response.ok, data: result };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+        
+        function showResult(elementId, result) {
+            const element = document.getElementById(elementId);
+            if (result.success) {
+                element.innerHTML = `<div class="success"><strong>Success!</strong><pre>${JSON.stringify(result.data, null, 2)}</pre></div>`;
+            } else {
+                element.innerHTML = `<div class="error"><strong>Error:</strong> ${result.error || JSON.stringify(result.data)}</div>`;
+            }
+        }
+        
+        async function checkEmailConfig() {
+            const result = await makeRequest('/api/auth/admin-debug/');
+            showResult('config-result', result);
+        }
+        
+        async function resetCooldowns() {
+            const result = await makeRequest('/api/auth/admin-debug/reset-cooldowns/', 'POST');
+            showResult('cooldown-result', result);
+        }
+        
+        async function testEmail() {
+            const email = document.getElementById('test-email').value;
+            if (!email) {
+                alert('Please enter your email address');
+                return;
+            }
+            
+            const result = await makeRequest('/api/auth/admin-debug/test-email/', 'POST', { email });
+            showResult('test-email-result', result);
+        }
+        
+        async function sendVerification() {
+            const email = document.getElementById('verification-email').value;
+            if (!email) {
+                alert('Please enter your email address');
+                return;
+            }
+            
+            const result = await makeRequest('/api/auth/admin-debug/send-verification/', 'POST', { email });
+            showResult('verification-result', result);
+        }
+        
+        async function listUsers() {
+            const result = await makeRequest('/api/auth/admin-debug/users/');
+            showResult('users-result', result);
+        }
+        
+        // Auto-detect backend URL
+        document.getElementById('backend-url').textContent = `Backend: ${BACKEND_URL}`;
+    </script>
+</body>
+</html>

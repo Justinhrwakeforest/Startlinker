@@ -65,7 +65,41 @@ additional_origins = os.environ.get('CORS_ALLOWED_ORIGINS', '')
 if additional_origins:
     CORS_ALLOWED_ORIGINS.extend(additional_origins.split(','))
 
+# More permissive CORS settings for debugging
 CORS_ALLOW_CREDENTIALS = True
+
+# Allow debugging with permissive CORS if environment variable is set
+if os.environ.get('CORS_DEBUG', 'False').lower() == 'true':
+    CORS_ALLOW_ALL_ORIGINS = True
+    print("⚠️  WARNING: CORS_DEBUG enabled - allowing all origins!")
+else:
+    CORS_ALLOW_ALL_ORIGINS = False  # Keep False for security
+
+# Allow all common methods
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS', 
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+# Allow all common headers
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# Add preflight max age
+CORS_PREFLIGHT_MAX_AGE = 86400
 
 # CSRF trusted origins
 CSRF_TRUSTED_ORIGINS = [

@@ -60,6 +60,13 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
+# Always allow all origins in debug mode or with CORS_DEBUG
+if os.environ.get('CORS_DEBUG', 'False').lower() == 'true' or DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+    print("⚠️  WARNING: CORS_DEBUG enabled - allowing all origins!")
+else:
+    CORS_ALLOW_ALL_ORIGINS = False
+
 # Add additional CORS origins from environment
 additional_origins = os.environ.get('CORS_ALLOWED_ORIGINS', '')
 if additional_origins:
@@ -67,13 +74,6 @@ if additional_origins:
 
 # More permissive CORS settings for debugging
 CORS_ALLOW_CREDENTIALS = True
-
-# Allow debugging with permissive CORS if environment variable is set
-if os.environ.get('CORS_DEBUG', 'False').lower() == 'true':
-    CORS_ALLOW_ALL_ORIGINS = True
-    print("⚠️  WARNING: CORS_DEBUG enabled - allowing all origins!")
-else:
-    CORS_ALLOW_ALL_ORIGINS = False  # Keep False for security
 
 # Allow all common methods
 CORS_ALLOW_METHODS = [

@@ -110,6 +110,11 @@ CSRF_TRUSTED_ORIGINS = [
     "https://startlinker-backend.onrender.com",
 ]
 
+# Add additional CSRF trusted origins from environment
+additional_csrf_origins = os.environ.get('CSRF_TRUSTED_ORIGINS', '')
+if additional_csrf_origins:
+    CSRF_TRUSTED_ORIGINS.extend(additional_csrf_origins.split(','))
+
 # Security settings
 SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

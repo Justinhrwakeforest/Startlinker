@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Read Receipts Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #007cba;
+        }
+        .message {
+            background: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .message.own {
+            background: #dcf8c6;
+            margin-left: 50px;
+        }
+        .message.other {
+            background: white;
+            margin-right: 50px;
+        }
+        .read-status {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+        .read-receipts {
+            font-size: 0.7em;
+            color: #999;
+            margin-top: 3px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .delivered { background-color: #gray; }
+        .read { background-color: #4CAF50; }
+        .unread { background-color: #f44336; }
+        
+        button {
+            background: #007cba;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #005a8a;
+        }
+        .log {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: 10px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .user-switch {
+            background: #e3f2fd;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Message Read Receipts Test</h1>
+    <p>This page simulates the messaging interface to test read receipt functionality.</p>
+
+    <div class="user-switch">
+        <strong>Current User:</strong> 
+        <select id="currentUser">
+            <option value="alice">Alice Johnson</option>
+            <option value="bob">Bob Smith</option>
+            <option value="charlie">Charlie Brown</option>
+        </select>
+        <button onclick="switchUser()">Switch User</button>
+    </div>
+
+    <div class="test-section">
+        <h2>💬 1-on-1 Chat: Alice & Bob</h2>
+        <div id="chat1" class="chat-container">
+            <!-- Messages will be populated here -->
+        </div>
+        <button onclick="simulateReadReceipt('chat1')">Mark All Messages as Read</button>
+        <button onclick="sendMessage('chat1')">Send Test Message</button>
+    </div>
+
+    <div class="test-section">
+        <h2>👥 Group Chat: Alice, Bob & Charlie</h2>
+        <div id="chat2" class="chat-container">
+            <!-- Messages will be populated here -->
+        </div>
+        <button onclick="simulateReadReceipt('chat2')">Mark All Messages as Read</button>
+        <button onclick="sendMessage('chat2')">Send Test Message</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 WebSocket Simulation Log</h2>
+        <div id="log" class="log"></div>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <script>
+        // Mock data structure
+        let currentUser = 'alice';
+        let conversations = {
+            chat1: {
+                name: "Alice & Bob",
+                type: "direct",
+                participants: ['alice', 'bob'],
+                messages: [
+                    {
+                        id: 'msg1',
+                        sender: 'alice',
+                        content: 'Hey Bob! How are you doing?',
+                        sent_at: '2024-01-15T10:00:00Z',
+                        read_receipts: []
+                    },
+                    {
+                        id: 'msg2',
+                        sender: 'bob',
+                        content: 'Hi Alice! I\'m doing great, thanks for asking! 😊',
+                        sent_at: '2024-01-15T10:02:00Z',
+                        read_receipts: []
+                    },
+                    {
+                        id: 'msg3',
+                        sender: 'alice',
+                        content: 'That\'s awesome! Want to grab coffee later?',
+                        sent_at: '2024-01-15T10:05:00Z',
+                        read_receipts: []
+                    },
+                    {
+                        id: 'msg4',
+                        sender: 'bob',
+                        content: 'Sure! Let\'s meet at the usual place at 3 PM.',
+                        sent_at: '2024-01-15T10:07:00Z',
+                        read_receipts: []
+                    }
+                ]
+            },
+            chat2: {
+                name: "Test Group Chat",
+                type: "group",
+                participants: ['alice', 'bob', 'charlie'],
+                messages: [
+                    {
+                        id: 'msg5',
+                        sender: 'alice',
+                        content: 'Hey everyone! Welcome to our test group chat!',
+                        sent_at: '2024-01-15T11:00:00Z',
+                        read_receipts: []
+                    },
+                    {
+                        id: 'msg6',
+                        sender: 'bob',
+                        content: 'Thanks Alice! This is pretty cool.',
+                        sent_at: '2024-01-15T11:02:00Z',
+                        read_receipts: []
+                    },
+                    {
+                        id: 'msg7',
+                        sender: 'charlie',
+                        content: 'Hello everyone! Nice to be here! 👋',
+                        sent_at: '2024-01-15T11:03:00Z',
+                        read_receipts: []
+                    },
+                    {
+                        id: 'msg8',
+                        sender: 'alice',
+                        content: 'Let\'s test the read receipts feature together.',
+                        sent_at: '2024-01-15T11:05:00Z',
+                        read_receipts: []
+                    }
+                ]
+            }
+        };
+
+        const users = {
+            alice: { name: 'Alice Johnson', color: '#4CAF50' },
+            bob: { name: 'Bob Smith', color: '#2196F3' },
+            charlie: { name: 'Charlie Brown', color: '#FF9800' }
+        };
+
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function switchUser() {
+            currentUser = document.getElementById('currentUser').value;
+            log(`👤 Switched to user: ${users[currentUser].name}`);
+            renderChats();
+        }
+
+        function renderMessage(message, chatType) {
+            const isOwn = message.sender === currentUser;
+            const senderName = users[message.sender].name;
+            
+            // Calculate read status
+            const readBy = message.read_receipts.map(receipt => users[receipt.user_id]?.name).filter(Boolean);
+            const isRead = message.read_receipts.some(receipt => receipt.user_id === currentUser);
+            
+            let readStatusHtml = '';
+            if (isOwn) {
+                if (readBy.length > 0) {
+                    readStatusHtml = `<div class="read-receipts">✅ Read by: ${readBy.join(', ')}</div>`;
+                } else {
+                    readStatusHtml = `<div class="read-receipts">📨 Delivered</div>`;
+                }
+            }
+
+            return `
+                <div class="message ${isOwn ? 'own' : 'other'}">
+                    <div><strong>${senderName}:</strong> ${message.content}</div>
+                    <div class="read-status">
+                        ${new Date(message.sent_at).toLocaleTimeString()}
+                        ${isRead && !isOwn ? '(Read)' : ''}
+                    </div>
+                    ${readStatusHtml}
+                </div>
+            `;
+        }
+
+        function renderChat(chatId) {
+            const chat = conversations[chatId];
+            const chatDiv = document.getElementById(chatId);
+            
+            chatDiv.innerHTML = chat.messages.map(msg => renderMessage(msg, chat.type)).join('');
+        }
+
+        function renderChats() {
+            renderChat('chat1');
+            renderChat('chat2');
+        }
+
+        function simulateReadReceipt(chatId) {
+            const chat = conversations[chatId];
+            
+            // Mark all messages not sent by current user as read
+            chat.messages.forEach(message => {
+                if (message.sender !== currentUser) {
+                    // Check if already read by current user
+                    const alreadyRead = message.read_receipts.some(receipt => receipt.user_id === currentUser);
+                    
+                    if (!alreadyRead) {
+                        message.read_receipts.push({
+                            user_id: currentUser,
+                            user: {
+                                id: currentUser,
+                                username: currentUser,
+                                full_name: users[currentUser].name
+                            },
+                            read_at: new Date().toISOString()
+                        });
+                        
+                        log(`📖 ${users[currentUser].name} read message: "${message.content.substring(0, 30)}..."`);
+                        
+                        // Simulate WebSocket notification
+                        setTimeout(() => {
+                            log(`🔄 WebSocket: Read receipt sent for message ${message.id}`);
+                        }, 100);
+                    }
+                }
+            });
+            
+            // Simulate API call
+            log(`🌐 API: POST /api/messaging/mark-read/ - conversation_id: ${chatId}`);
+            
+            renderChats();
+        }
+
+        function sendMessage(chatId) {
+            const chat = conversations[chatId];
+            const messageContent = prompt(`Send message as ${users[currentUser].name}:`);
+            
+            if (messageContent) {
+                const newMessage = {
+                    id: 'msg' + Date.now(),
+                    sender: currentUser,
+                    content: messageContent,
+                    sent_at: new Date().toISOString(),
+                    read_receipts: []
+                };
+                
+                chat.messages.push(newMessage);
+                log(`💌 ${users[currentUser].name} sent: "${messageContent}"`);
+                log(`🔄 WebSocket: Message broadcasted to ${chat.participants.length} participants`);
+                
+                renderChats();
+            }
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🚀 Read Receipts Test Page Loaded');
+            log('👤 Current user: Alice Johnson');
+            renderChats();
+        });
+
+        // Simulate some initial read receipts for demonstration
+        setTimeout(() => {
+            // Bob reads Alice's first message
+            conversations.chat1.messages[0].read_receipts.push({
+                user_id: 'bob',
+                user: { id: 'bob', username: 'bob', full_name: 'Bob Smith' },
+                read_at: '2024-01-15T10:01:00Z'
+            });
+            
+            // Alice reads Bob's response
+            conversations.chat1.messages[1].read_receipts.push({
+                user_id: 'alice',
+                user: { id: 'alice', username: 'alice', full_name: 'Alice Johnson' },
+                read_at: '2024-01-15T10:03:00Z'
+            });
+            
+            // In group chat, Bob reads Alice's welcome message
+            conversations.chat2.messages[0].read_receipts.push({
+                user_id: 'bob',
+                user: { id: 'bob', username: 'bob', full_name: 'Bob Smith' },
+                read_at: '2024-01-15T11:01:00Z'
+            });
+            
+            renderChats();
+            log('💫 Initialized with some sample read receipts');
+        }, 1000);
+    </script>
+</body>
+</html>

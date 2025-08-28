@@ -91,7 +91,20 @@ def send_verification_to_email(request):
     """
     Send verification email to a specific email address (for registration flow)
     """
-    email = request.data.get('email')
+    try:
+        # Handle both JSON and form data
+        if hasattr(request, 'data') and request.data:
+            email = request.data.get('email')
+        else:
+            # Fallback to JSON parsing
+            import json
+            data = json.loads(request.body) if request.body else {}
+            email = data.get('email')
+    except (json.JSONDecodeError, AttributeError) as e:
+        return Response({
+            'success': False,
+            'message': 'Invalid request format.'
+        }, status=status.HTTP_400_BAD_REQUEST)
     
     if not email:
         return Response({
@@ -101,9 +114,11 @@ def send_verification_to_email(request):
     
     try:
         user = User.objects.get(email=email)
+        logger.info(f"Found user for verification: {user.username} ({email})")
         
         # Check if email is already verified
         if user.email_verified:
+            logger.info(f"Email already verified for user: {user.username}")
             return Response({
                 'success': False,
                 'message': 'This email is already verified.'
@@ -111,20 +126,24 @@ def send_verification_to_email(request):
         
         # Check cooldown period
         if not can_resend_verification_email(user):
+            logger.info(f"Cooldown period active for user: {user.username}")
             return Response({
                 'success': False,
                 'message': 'Please wait a few minutes before requesting another verification email.'
             }, status=status.HTTP_429_TOO_MANY_REQUESTS)
         
         # Send verification email
+        logger.info(f"Attempting to send verification email to: {email}")
         success = send_verification_email(user, request)
         
         if success:
+            logger.info(f"Verification email sent successfully to: {email}")
             return Response({
                 'success': True,
                 'message': 'Verification email has been sent.'
             }, status=status.HTTP_200_OK)
         else:
+            logger.error(f"Failed to send verification email to: {email}")
             return Response({
                 'success': False,
                 'message': 'Failed to send verification email. Please try again later.'
@@ -132,10 +151,17 @@ def send_verification_to_email(request):
             
     except User.DoesNotExist:
         # Don't reveal that the email doesn't exist for security
+        logger.info(f"User does not exist for email: {email}")
         return Response({
             'success': True,
             'message': 'If an account with this email exists, a verification email has been sent.'
         }, status=status.HTTP_200_OK)
+    except Exception as e:
+        logger.error(f"Unexpected error in send_verification_to_email: {str(e)}")
+        return Response({
+            'success': False,
+            'message': 'An error occurred. Please try again later.'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

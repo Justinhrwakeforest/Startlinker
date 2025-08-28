@@ -62,6 +62,7 @@ class MessageSerializer(serializers.ModelSerializer):
     reaction_counts = serializers.SerializerMethodField()
     user_reactions = serializers.SerializerMethodField()
     is_read = serializers.SerializerMethodField()
+    read_receipts = serializers.SerializerMethodField()
     voice_duration = serializers.SerializerMethodField()
     voice_file = serializers.SerializerMethodField()
     pinned_by = UserSerializer(read_only=True)
@@ -72,7 +73,7 @@ class MessageSerializer(serializers.ModelSerializer):
             'id', 'conversation', 'sender', 'content', 'sent_at',
             'edited_at', 'is_deleted', 'is_system_message',
             'reply_to', 'attachments', 'reactions', 'reaction_counts', 
-            'user_reactions', 'is_read', 'message_type', 'voice_file', 'voice_duration',
+            'user_reactions', 'is_read', 'read_receipts', 'message_type', 'voice_file', 'voice_duration',
             'is_pinned', 'pinned_at', 'pinned_by', 'is_announcement'
         ]
         read_only_fields = ['sent_at', 'edited_at']
@@ -98,6 +99,22 @@ class MessageSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             return obj.read_receipts.filter(user=request.user).exists()
         return False
+    
+    def get_read_receipts(self, obj):
+        """Get read receipts for this message"""
+        from .models import MessageRead
+        read_receipts = MessageRead.objects.filter(message=obj).select_related('user')
+        return [
+            {
+                'user_id': receipt.user.id,
+                'user': {
+                    'id': receipt.user.id,
+                    'username': receipt.user.username,
+                    'full_name': receipt.user.get_full_name() or receipt.user.username
+                },
+                'read_at': receipt.read_at.isoformat()
+            } for receipt in read_receipts
+        ]
     
     def get_voice_duration(self, obj):
         """Get voice duration, ensuring it's JSON-serializable"""

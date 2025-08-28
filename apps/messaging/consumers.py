@@ -268,7 +268,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Prefetch related data
         message = Message.objects.select_related(
             'sender', 'reply_to', 'reply_to__sender'
-        ).prefetch_related('read_receipts').get(id=message.id)
+        ).prefetch_related('read_receipts__user').get(id=message.id)
+        
+        # Serialize read receipts
+        read_receipts = [
+            {
+                'user_id': receipt.user.id,
+                'user': {
+                    'id': receipt.user.id,
+                    'username': receipt.user.username,
+                    'full_name': receipt.user.get_full_name() or receipt.user.username
+                },
+                'read_at': receipt.read_at.isoformat()
+            } for receipt in message.read_receipts.all()
+        ]
         
         return {
             'id': str(message.id),
@@ -287,7 +300,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'content': message.reply_to.content[:100],
                 'sender': message.reply_to.sender.username
             } if message.reply_to else None,
-            'read_by': list(message.read_receipts.values_list('user_id', flat=True)),
+            'read_receipts': read_receipts,
+            'read_by': list(message.read_receipts.values_list('user_id', flat=True)),  # Kept for backward compatibility
             'is_deleted': message.is_deleted
         }
     

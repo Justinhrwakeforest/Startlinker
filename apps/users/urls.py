@@ -26,6 +26,9 @@ from .admin_debug_views import (
     debug_email_config, test_email_send, reset_email_cooldowns,
     send_verification_debug, list_unverified_users
 )
+from .email_debug_views import (
+    email_config_debug, send_test_email, send_verification_test, email_debug_ui
+)
 
 urlpatterns = [
     path('register/', UserRegistrationView.as_view(), name='user-register'),
@@ -71,6 +74,12 @@ urlpatterns = [
     path('resend-verification/', resend_verification_email, name='resend-verification-email'),
     path('send-verification/', send_verification_to_email, name='send-verification-to-email'),
     path('verification-status/', verification_status, name='verification-status'),
+    
+    # Debug endpoints (remove in production)
+    path('debug/email-config/', email_config_debug, name='email-config-debug'),
+    path('debug/send-test-email/', send_test_email, name='send-test-email'),
+    path('debug/send-verification-test/', send_verification_test, name='send-verification-test'),
+    path('debug/email-ui/', email_debug_ui, name='email-debug-ui'),
     
     # Resume management endpoints
     path('resumes/', resume_list_create, name='resume-list-create'),

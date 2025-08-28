@@ -158,3 +158,6 @@ EMAIL_VERIFICATION_SETTINGS = {
 
 # Enforce email verification in production
 REQUIRE_EMAIL_VERIFICATION = True
+
+# Frontend URL for email verification links
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://startlinker-frontend.onrender.com')

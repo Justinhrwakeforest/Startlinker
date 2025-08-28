@@ -475,6 +475,104 @@ class StartupCollaborationViewSet(viewsets.ModelViewSet):
                 
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True, methods=['get', 'post', 'delete'])
+    def collaborators(self, request, pk=None):
+        """Manage collaboration collaborators"""
+        collaboration = self.get_object()
+        
+        if request.method == 'GET':
+            # Get list of collaborators
+            collaborators = CollaborationCollaborator.objects.filter(
+                collaboration=collaboration
+            ).select_related('user', 'added_by')
+            
+            # Create a simple serializer for collaborator data
+            collaborator_data = []
+            for collaborator in collaborators:
+                collaborator_data.append({
+                    'id': collaborator.user.id,
+                    'username': collaborator.user.username,
+                    'first_name': collaborator.user.first_name,
+                    'last_name': collaborator.user.last_name,
+                    'permission_level': collaborator.permission_level,
+                    'added_at': collaborator.added_at,
+                    'added_by': collaborator.added_by.username
+                })
+            
+            return Response(collaborator_data)
+        
+        elif request.method == 'POST':
+            # Add new collaborator
+            # Check if user can edit collaboration
+            if collaboration.owner != request.user:
+                return Response(
+                    {'error': 'Only owner can add collaborators'}, 
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            user_id = request.data.get('user_id')
+            permission_level = request.data.get('permission_level', 'edit')
+            
+            try:
+                user_to_add = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                return Response(
+                    {'error': 'User not found'}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Check if already a collaborator
+            if CollaborationCollaborator.objects.filter(
+                collaboration=collaboration,
+                user=user_to_add
+            ).exists():
+                return Response(
+                    {'error': 'User is already a collaborator'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Create collaborator
+            collaborator = CollaborationCollaborator.objects.create(
+                collaboration=collaboration,
+                user=user_to_add,
+                permission_level=permission_level,
+                added_by=request.user
+            )
+            
+            return Response({
+                'id': collaborator.user.id,
+                'username': collaborator.user.username,
+                'first_name': collaborator.user.first_name,
+                'last_name': collaborator.user.last_name,
+                'permission_level': collaborator.permission_level,
+                'added_at': collaborator.added_at,
+                'added_by': collaborator.added_by.username
+            }, status=status.HTTP_201_CREATED)
+        
+        elif request.method == 'DELETE':
+            # Remove collaborator
+            # Check if user can edit collaboration
+            if collaboration.owner != request.user:
+                return Response(
+                    {'error': 'Only owner can remove collaborators'}, 
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            user_id = request.data.get('user_id')
+            
+            deleted_count, _ = CollaborationCollaborator.objects.filter(
+                collaboration=collaboration,
+                user_id=user_id
+            ).delete()
+            
+            if deleted_count > 0:
+                return Response({'message': 'Collaborator removed'})
+            else:
+                return Response(
+                    {'error': 'Collaborator not found'}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
 
 class AchievementViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet for achievements (read-only)"""

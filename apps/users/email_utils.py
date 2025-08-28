@@ -29,13 +29,9 @@ def send_verification_email(user, request=None):
         from_email = email_settings.get('FROM_EMAIL', settings.DEFAULT_FROM_EMAIL)
         subject_prefix = email_settings.get('SUBJECT_PREFIX', '[StartLinker] ')
         
-        # Build verification URL
-        if request:
-            base_url = f"{request.scheme}://{request.get_host()}"
-        else:
-            base_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')
-            
-        verification_url = f"{base_url}/auth/verify-email/{user.email_verification_token}"
+        # Build verification URL - always use frontend URL for verification links
+        frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')
+        verification_url = f"{frontend_url}/auth/verify-email/{user.email_verification_token}"
         
         # Email content
         subject = f"{subject_prefix}Verify Your Email Address"

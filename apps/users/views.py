@@ -42,7 +42,9 @@ class UserRegistrationView(generics.CreateAPIView):
             user = serializer.save()
             
             # Send email verification
+            logger.info(f"Attempting to send verification email to new user: {user.email}")
             verification_sent = send_verification_email(user, request)
+            logger.info(f"Verification email result for {user.email}: {verification_sent}")
             
             # Don't create token immediately - user must verify email first
             # Only create token if email verification is disabled or for testing

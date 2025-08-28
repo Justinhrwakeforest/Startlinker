@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>StartLinker Email Verification Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: #007cba; color: white; padding: 10px 15px; border: none; border-radius: 3px; cursor: pointer; margin: 5px; }
+        button:hover { background: #005a8b; }
+        input[type="email"] { width: 300px; padding: 8px; margin: 5px; }
+        .result { margin-top: 10px; padding: 10px; border-radius: 3px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 12px; }
+        .test-step { margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>StartLinker Email Verification Live Test</h1>
+    <p>This will test your email verification system step by step to identify the exact issue.</p>
+    
+    <div class="section">
+        <h3>Step 1: Test Backend Connection</h3>
+        <button onclick="testBackendConnection()">Test Backend</button>
+        <div id="backendResult"></div>
+    </div>
+    
+    <div class="section">
+        <h3>Step 2: Check Email Configuration</h3>
+        <button onclick="checkEmailConfig()">Check Email Config</button>
+        <div id="emailConfigResult"></div>
+    </div>
+    
+    <div class="section">
+        <h3>Step 3: Test Direct Email Send</h3>
+        <input type="email" id="testEmailDirect" placeholder="Enter your email address">
+        <button onclick="testDirectEmail()">Send Test Email</button>
+        <div id="directEmailResult"></div>
+    </div>
+    
+    <div class="section">
+        <h3>Step 4: Test Verification Email</h3>
+        <input type="email" id="testEmailVerification" placeholder="Enter your email address">
+        <button onclick="testVerificationEmail()">Send Verification Email</button>
+        <div id="verificationResult"></div>
+    </div>
+    
+    <div class="section">
+        <h3>Step 5: Test Complete Signup Flow</h3>
+        <input type="email" id="signupEmail" placeholder="Enter your email address">
+        <input type="text" id="signupUsername" placeholder="Enter username">
+        <button onclick="testCompleteSignup()">Test Complete Signup</button>
+        <div id="signupResult"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://startlinker-backend.onrender.com';
+        
+        async function makeRequest(url, method = 'GET', data = null) {
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            };
+            
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+            
+            try {
+                console.log(`Making ${method} request to ${url}`, data);
+                const response = await fetch(url, options);
+                const responseData = await response.text();
+                
+                let parsedData;
+                try {
+                    parsedData = JSON.parse(responseData);
+                } catch {
+                    parsedData = responseData;
+                }
+                
+                return {
+                    status: response.status,
+                    ok: response.ok,
+                    data: parsedData
+                };
+            } catch (error) {
+                console.error('Request error:', error);
+                return {
+                    status: 0,
+                    ok: false,
+                    error: error.message
+                };
+            }
+        }
+        
+        function displayResult(elementId, result, title) {
+            const element = document.getElementById(elementId);
+            let className = result.ok ? 'success' : 'error';
+            let statusText = result.ok ? '✅ SUCCESS' : '❌ FAILED';
+            
+            if (result.status === 0) {
+                statusText = '🔌 CONNECTION FAILED';
+                className = 'error';
+            }
+            
+            element.innerHTML = `
+                <div class="result ${className}">
+                    <h4>${title} - ${statusText} (Status: ${result.status || 'Network Error'})</h4>
+                    <pre>${JSON.stringify(result.data || result.error, null, 2)}</pre>
+                </div>
+            `;
+        }
+        
+        async function testBackendConnection() {
+            const result = await makeRequest(`${API_BASE}/api/core/health/`);
+            displayResult('backendResult', result, 'Backend Connection Test');
+        }
+        
+        async function checkEmailConfig() {
+            const result = await makeRequest(`${API_BASE}/api/users/debug/email-config/`);
+            displayResult('emailConfigResult', result, 'Email Configuration Check');
+        }
+        
+        async function testDirectEmail() {
+            const email = document.getElementById('testEmailDirect').value;
+            if (!email) {
+                alert('Please enter an email address');
+                return;
+            }
+            
+            const result = await makeRequest(`${API_BASE}/api/users/debug/send-test-email/`, 'POST', {
+                email: email
+            });
+            displayResult('directEmailResult', result, 'Direct Email Test');
+        }
+        
+        async function testVerificationEmail() {
+            const email = document.getElementById('testEmailVerification').value;
+            if (!email) {
+                alert('Please enter an email address');
+                return;
+            }
+            
+            const result = await makeRequest(`${API_BASE}/api/users/debug/send-verification-test/`, 'POST', {
+                email: email
+            });
+            displayResult('verificationResult', result, 'Verification Email Test');
+        }
+        
+        async function testCompleteSignup() {
+            const email = document.getElementById('signupEmail').value;
+            const username = document.getElementById('signupUsername').value;
+            
+            if (!email || !username) {
+                alert('Please enter both email and username');
+                return;
+            }
+            
+            // First try to register
+            const signupResult = await makeRequest(`${API_BASE}/api/users/register/`, 'POST', {
+                email: email,
+                username: username,
+                password: 'TestPassword123!',
+                first_name: 'Test',
+                last_name: 'User'
+            });
+            
+            let resultHtml = `<h4>Signup Result:</h4><pre>${JSON.stringify(signupResult, null, 2)}</pre>`;
+            
+            // If signup worked, test verification
+            if (signupResult.ok) {
+                const verifyResult = await makeRequest(`${API_BASE}/api/auth/send-verification/`, 'POST', {
+                    email: email
+                });
+                
+                resultHtml += `<h4>Verification Email Result:</h4><pre>${JSON.stringify(verifyResult, null, 2)}</pre>`;
+            }
+            
+            document.getElementById('signupResult').innerHTML = `<div class="result info">${resultHtml}</div>`;
+        }
+        
+        // Auto-test backend connection on page load
+        window.onload = function() {
+            testBackendConnection();
+        };
+    </script>
+</body>
+</html>

@@ -91,19 +91,40 @@ def send_verification_to_email(request):
     """
     Send verification email to a specific email address (for registration flow)
     """
+    import json
+    
     try:
-        # Handle both JSON and form data
+        # Try multiple ways to get the email
+        email = None
+        
+        # Method 1: request.data (DRF standard)
         if hasattr(request, 'data') and request.data:
             email = request.data.get('email')
-        else:
-            # Fallback to JSON parsing
-            import json
-            data = json.loads(request.body) if request.body else {}
-            email = data.get('email')
-    except (json.JSONDecodeError, AttributeError) as e:
+            logger.info(f"Got email from request.data: {email}")
+        
+        # Method 2: JSON body
+        if not email and request.body:
+            try:
+                data = json.loads(request.body.decode('utf-8') if isinstance(request.body, bytes) else request.body)
+                email = data.get('email')
+                logger.info(f"Got email from JSON body: {email}")
+            except (json.JSONDecodeError, UnicodeDecodeError) as json_error:
+                logger.warning(f"Failed to parse JSON body: {json_error}")
+        
+        # Method 3: POST data
+        if not email:
+            email = request.POST.get('email')
+            if email:
+                logger.info(f"Got email from POST data: {email}")
+        
+        logger.info(f"Final email value: {email}")
+        
+    except Exception as e:
+        logger.error(f"Error parsing request in send_verification_to_email: {str(e)}")
         return Response({
             'success': False,
-            'message': 'Invalid request format.'
+            'message': 'Invalid request format.',
+            'error': str(e)
         }, status=status.HTTP_400_BAD_REQUEST)
     
     if not email:

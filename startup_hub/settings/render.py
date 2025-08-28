@@ -115,11 +115,16 @@ additional_csrf_origins = os.environ.get('CSRF_TRUSTED_ORIGINS', '')
 if additional_csrf_origins:
     CSRF_TRUSTED_ORIGINS.extend(additional_csrf_origins.split(','))
 
-# Security settings
-SECURE_SSL_REDIRECT = True
+# Security settings - can be overridden by environment variables
+SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'True').lower() == 'true'
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'True').lower() == 'true'
+CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', 'True').lower() == 'true'
+
+# Additional CSRF settings for debugging
+CSRF_COOKIE_SAMESITE = 'Lax'  # Changed from 'Strict' to allow cross-site requests
+CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read the cookie
+CSRF_USE_SESSIONS = False  # Use cookies instead of sessions
 
 # Logging
 LOGGING = {

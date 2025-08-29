@@ -5,8 +5,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from .email_utils import (
-    send_verification_email, 
+from .gmail_friendly_email_utils import (
+    send_gmail_friendly_verification_email as send_verification_email, 
     verify_email_token, 
     can_resend_verification_email,
     is_verification_token_valid
@@ -36,6 +36,8 @@ def verify_email(request):
         return Response({
             'success': True,
             'message': message,
+            'redirect_to_login': True,  # Tell frontend to redirect to login
+            'login_message': 'Your email has been verified! Please log in to continue.',
             'user': {
                 'id': user.id,
                 'email': user.email,

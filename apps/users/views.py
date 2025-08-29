@@ -21,13 +21,16 @@ from django.db.models import Q
 from PIL import Image
 import json
 import os
+import logging
 from .serializers import (
     UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer, 
     ChangePasswordSerializer, UserInterestSerializer, UserSettingsSerializer, ResumeSerializer
 )
 from .models import User, UserInterest, UserSettings, Resume
 from .activity_tracker import ActivityTracker
-from .email_utils import send_verification_email
+from .gmail_friendly_email_utils import send_gmail_friendly_verification_email as send_verification_email
+
+logger = logging.getLogger(__name__)
 
 class UserRegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()

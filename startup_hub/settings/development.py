@@ -1,5 +1,9 @@
 # Development settings for StartupHub
 from .base import *
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-change-in-production')
@@ -111,11 +115,12 @@ if DEBUG:
     # Enable Django Debug Toolbar if installed
     try:
         import debug_toolbar
-        INSTALLED_APPS.append('debug_toolbar')
-        MIDDLEWARE.insert(1, 'debug_toolbar.middleware.DebugToolbarMiddleware')
+        # DISABLED - causing URL namespace issues
+        # INSTALLED_APPS.append('debug_toolbar')
+        # MIDDLEWARE.insert(1, 'debug_toolbar.middleware.DebugToolbarMiddleware')
         
         DEBUG_TOOLBAR_CONFIG = {
-            'SHOW_TOOLBAR_CALLBACK': lambda request: DEBUG,
+            'SHOW_TOOLBAR_CALLBACK': lambda request: False,  # Disable for now
             'SHOW_COLLAPSED': True,
         }
         
@@ -139,12 +144,28 @@ JOB_POSTING_SETTINGS = {
     'AUTO_APPROVE_VERIFIED_STARTUPS': False,  # Even verified startups require approval
 }
 
-# SendGrid Email Configuration
-SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')  # Set via environment variable
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@startlinker.com')
-EMAIL_BACKEND = 'apps.users.sendgrid_backend.SendGridBackend'  # Use SendGrid for email
-EMAIL_HOST_USER = DEFAULT_FROM_EMAIL
-SENDGRID_SANDBOX_MODE_IN_DEBUG = False  # Disable sandbox mode to actually send emails
+# Email Configuration for Development
+# SendGrid Configuration with improved backend
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
+if SENDGRID_API_KEY:
+    EMAIL_BACKEND = 'apps.users.working_sendgrid_backend.WorkingSendGridBackend'
+    SENDGRID_SANDBOX_MODE_IN_DEBUG = False  # Set to False to actually send emails
+    DEFAULT_FROM_EMAIL = 'noreply@startlinker.com'
+    EMAIL_HOST_USER = DEFAULT_FROM_EMAIL
+    SERVER_EMAIL = DEFAULT_FROM_EMAIL
+    
+    # Frontend URL for email links
+    FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
+else:
+    # Fallback to console backend if no SendGrid API key
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = 'noreply@startlinker.com'
+    EMAIL_HOST_USER = DEFAULT_FROM_EMAIL
+    print("WARNING: No SENDGRID_API_KEY found, using console email backend")
+
+# Alternative: Use file backend to save emails to files (uncomment to use)
+# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+# EMAIL_FILE_PATH = BASE_DIR / 'emails'
 
 # Email verification settings
 EMAIL_VERIFICATION_SETTINGS = {

@@ -16,13 +16,15 @@ import logging
 logger = logging.getLogger(__name__)
 User = get_user_model()
 
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 @permission_classes([AllowAny])
 def verify_email(request):
     """
     Verify user's email address using verification token
+    Supports both GET (from email links) and POST (from frontend forms)
     """
-    token = request.data.get('token')
+    # Get token from either GET params or POST data
+    token = request.GET.get('token') or request.data.get('token')
     
     if not token:
         return Response({
@@ -32,24 +34,43 @@ def verify_email(request):
     
     user, message = verify_email_token(token)
     
-    if user:
-        return Response({
-            'success': True,
-            'message': message,
-            'redirect_to_login': True,  # Tell frontend to redirect to login
-            'login_message': 'Your email has been verified! Please log in to continue.',
-            'user': {
-                'id': user.id,
-                'email': user.email,
-                'username': user.username,
-                'email_verified': user.email_verified
-            }
-        }, status=status.HTTP_200_OK)
+    # Handle GET requests (email clicks) with redirect
+    if request.method == 'GET':
+        from django.conf import settings
+        from django.shortcuts import redirect
+        from django.http import HttpResponse
+        
+        frontend_url = getattr(settings, 'FRONTEND_URL', 'https://startlinker-frontend.onrender.com')
+        
+        if user:
+            # Redirect to login page with success message
+            redirect_url = f"{frontend_url}/login?verified=true&message=Your email has been verified! Please log in to continue."
+            return redirect(redirect_url)
+        else:
+            # Redirect to login page with error message
+            redirect_url = f"{frontend_url}/login?error=true&message=Verification failed. Please try again or request a new verification email."
+            return redirect(redirect_url)
+    
+    # Handle POST requests (API calls) with JSON response
     else:
-        return Response({
-            'success': False,
-            'message': message
-        }, status=status.HTTP_400_BAD_REQUEST)
+        if user:
+            return Response({
+                'success': True,
+                'message': message,
+                'redirect_to_login': True,  # Tell frontend to redirect to login
+                'login_message': 'Your email has been verified! Please log in to continue.',
+                'user': {
+                    'id': user.id,
+                    'email': user.email,
+                    'username': user.username,
+                    'email_verified': user.email_verified
+                }
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                'success': False,
+                'message': message
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

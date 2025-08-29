@@ -29,9 +29,9 @@ def send_gmail_friendly_verification_email(user, request=None):
         email_settings = getattr(settings, 'EMAIL_VERIFICATION_SETTINGS', {})
         from_email = 'noreply@startlinker.com'  # Use noreply@ as requested
         
-        # Build verification URL
-        frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')
-        verification_url = f"{frontend_url}/auth/verify-email/{user.email_verification_token}"
+        # Build verification URL - should point to backend API, not frontend
+        backend_url = request.build_absolute_uri('/').rstrip('/') if request else 'https://startlinker-backend.onrender.com'
+        verification_url = f"{backend_url}/api/auth/verify-email/?token={user.email_verification_token}"
         
         # Gmail-friendly subject (avoid "verify" trigger words)
         subject = "Complete Your StartLinker Registration"

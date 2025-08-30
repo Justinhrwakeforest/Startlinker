@@ -57,6 +57,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://www.startlinker.com", 
     "https://startlinker.onrender.com",
     "https://startlinker-frontend.onrender.com",
+    "https://startlinker-frontend-web.onrender.com",
     "http://localhost:3000",
 ]
 
@@ -107,6 +108,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://www.startlinker.com",
     "https://startlinker.onrender.com",
     "https://startlinker-frontend.onrender.com", 
+    "https://startlinker-frontend-web.onrender.com",
     "https://startlinker-backend.onrender.com",
 ]
 
@@ -170,4 +172,4 @@ EMAIL_VERIFICATION_SETTINGS = {
 REQUIRE_EMAIL_VERIFICATION = True
 
 # Frontend URL for email verification links
-FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://startlinker-frontend.onrender.com')
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://startlinker-frontend-web.onrender.com')

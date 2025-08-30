@@ -13,6 +13,7 @@ from .api_views import (
     user_points_detail, user_points_history, user_stats_summary,
     user_achievements_list, achievements_leaderboard
 )
+from .admin_views import setup_admin, admin_status
 from .achievements_api import user_achievements_summary
 from .activity_api_views import user_activity_feed
 from .resume_views import (
@@ -27,7 +28,7 @@ from .admin_debug_views import (
     send_verification_debug, list_unverified_users
 )
 from .email_debug_views import (
-    email_config_debug, send_test_email, send_verification_test, email_debug_ui
+    email_debug_dashboard, send_test_email_debug, verify_user_debug, resend_verification_debug
 )
 
 urlpatterns = [
@@ -76,10 +77,10 @@ urlpatterns = [
     path('verification-status/', verification_status, name='verification-status'),
     
     # Debug endpoints (remove in production)
-    path('debug/email-config/', email_config_debug, name='email-config-debug'),
-    path('debug/send-test-email/', send_test_email, name='send-test-email'),
-    path('debug/send-verification-test/', send_verification_test, name='send-verification-test'),
-    path('debug/email-ui/', email_debug_ui, name='email-debug-ui'),
+    path('debug/email-dashboard/', email_debug_dashboard, name='email-debug-dashboard'),
+    path('debug/send-test-email/', send_test_email_debug, name='send-test-email-debug'),
+    path('debug/verify-user/', verify_user_debug, name='verify-user-debug'),
+    path('debug/resend-verification/', resend_verification_debug, name='resend-verification-debug'),
     
     # Resume management endpoints
     path('resumes/', resume_list_create, name='resume-list-create'),
@@ -102,4 +103,8 @@ urlpatterns = [
     path('admin-debug/reset-cooldowns/', reset_email_cooldowns, name='reset-cooldowns'),
     path('admin-debug/send-verification/', send_verification_debug, name='send-verification-debug'),
     path('admin-debug/users/', list_unverified_users, name='list-unverified-users'),
+    
+    # Admin setup endpoints for production deployment
+    path('setup-admin/', setup_admin, name='setup-admin'),
+    path('admin-status/', admin_status, name='admin-status'),
 ]

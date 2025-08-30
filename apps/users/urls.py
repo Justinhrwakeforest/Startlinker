@@ -80,12 +80,6 @@ urlpatterns = [
     path('send-verification/', send_verification_to_email, name='send-verification-to-email'),
     path('verification-status/', verification_status, name='verification-status'),
     
-    # Debug endpoints (remove in production)
-    path('debug/email-dashboard/', email_debug_dashboard, name='email-debug-dashboard'),
-    path('debug/send-test-email/', send_test_email_debug, name='send-test-email-debug'),
-    path('debug/verify-user/', verify_user_debug, name='verify-user-debug'),
-    path('debug/resend-verification/', resend_verification_debug, name='resend-verification-debug'),
-    
     # Resume management endpoints
     path('resumes/', resume_list_create, name='resume-list-create'),
     path('resumes/<int:resume_id>/', resume_detail, name='resume-detail'),

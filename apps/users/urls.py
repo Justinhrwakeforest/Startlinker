@@ -13,7 +13,7 @@ from .api_views import (
     user_points_detail, user_points_history, user_stats_summary,
     user_achievements_list, achievements_leaderboard
 )
-from .admin_views import setup_admin, admin_status
+from .admin_views import setup_admin, admin_status, reset_admin_password_view
 from .achievements_api import user_achievements_summary
 from .activity_api_views import user_activity_feed
 from .resume_views import (
@@ -97,6 +97,7 @@ urlpatterns = [
     
     # Admin setup endpoints for production deployment
     path('setup-admin/', setup_admin, name='setup-admin'),
+    path('reset-admin-password/', reset_admin_password_view, name='reset-admin-password'),
     path('admin-status/', admin_status, name='admin-status'),
 ]
 

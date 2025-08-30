@@ -8,6 +8,7 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import user_passes_test
 from django.conf import settings
 from .admin_setup import create_admin_user
+from .admin_reset import reset_admin_password
 import json
 
 # Secret key for admin creation (should be set in environment)
@@ -145,3 +146,113 @@ def admin_status(request):
         'admin_count': admin_count,
         'setup_url': '/api/users/setup-admin/?format=html&secret=your-secret-key'
     })
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def reset_admin_password_view(request):
+    """
+    Reset admin user password in production
+    Requires secret key for security
+    
+    Usage: 
+    GET /api/auth/reset-admin-password/?secret=your-secret-key&format=html
+    """
+    
+    # Check if we have the secret key
+    if not is_admin_setup_request(request):
+        return JsonResponse({
+            'error': 'Unauthorized. Secret key required.',
+            'hint': 'Add ?secret=your-secret-key to the URL'
+        }, status=403)
+    
+    # Reset admin password
+    result = reset_admin_password()
+    
+    if request.GET.get('format') == 'html':
+        # Return HTML response for browser viewing
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Admin Password Reset - StartLinker</title>
+            <style>
+                body {{ 
+                    font-family: Arial, sans-serif; 
+                    max-width: 800px; 
+                    margin: 50px auto; 
+                    padding: 20px;
+                    background: #f5f5f5;
+                }}
+                .container {{
+                    background: white;
+                    padding: 30px;
+                    border-radius: 10px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                }}
+                .success {{ color: #27ae60; }}
+                .warning {{ color: #f39c12; }}
+                .error {{ color: #e74c3c; }}
+                .credentials {{
+                    background: #ecf0f1;
+                    padding: 15px;
+                    border-radius: 5px;
+                    margin: 20px 0;
+                    font-family: monospace;
+                }}
+                .admin-link {{
+                    display: inline-block;
+                    background: #3498db;
+                    color: white;
+                    padding: 10px 20px;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    margin-top: 20px;
+                }}
+                .admin-link:hover {{ background: #2980b9; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>🔧 StartLinker Admin Password Reset</h1>
+        """
+        
+        if result['status'] == 'reset':
+            html_content += f"""
+                <div class="success">
+                    <h2>✅ {result['message']}</h2>
+                    <div class="credentials">
+                        <strong>New Admin Credentials:</strong><br>
+                        Username: {result['username']}<br>
+                        Email: {result['email']}<br>
+                        New Password: {result['new_password']}<br>
+                    </div>
+                    <p><strong>⚠️ Important:</strong> Save this new password! It won't be shown again.</p>
+                    <a href="{result['admin_url']}" class="admin-link" target="_blank">Go to Admin Panel</a>
+                </div>
+            """
+        elif result['status'] == 'not_found':
+            html_content += f"""
+                <div class="error">
+                    <h2>❌ Admin User Not Found</h2>
+                    <p>{result['message']}</p>
+                    <p>You may need to create an admin user first.</p>
+                </div>
+            """
+        else:
+            html_content += f"""
+                <div class="error">
+                    <h2>❌ Error</h2>
+                    <p>{result['message']}</p>
+                </div>
+            """
+        
+        html_content += """
+            </div>
+        </body>
+        </html>
+        """
+        
+        return HttpResponse(html_content)
+    
+    # Return JSON response
+    return JsonResponse(result, json_dumps_params={'indent': 2})

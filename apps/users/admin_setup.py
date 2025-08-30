@@ -51,7 +51,7 @@ def create_admin_user():
             'username': admin_username,
             'email': admin_email,
             'password': admin_password,
-            'admin_url': f"{settings.BACKEND_URL or 'https://startlinker-backend.onrender.com'}/admin/"
+            'admin_url': 'https://startlinker-backend.onrender.com/admin/'
         }
         
     except Exception as e:

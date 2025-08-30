@@ -23,13 +23,17 @@ from .email_views import (
     verify_email, resend_verification_email, send_verification_to_email, 
     verification_status
 )
-from .admin_debug_views import (
-    debug_email_config, test_email_send, reset_email_cooldowns,
-    send_verification_debug, list_unverified_users
-)
-from .email_debug_views import (
-    email_debug_dashboard, send_test_email_debug, verify_user_debug, resend_verification_debug
-)
+try:
+    from .admin_debug_views import (
+        debug_email_config, test_email_send, reset_email_cooldowns,
+        send_verification_debug, list_unverified_users
+    )
+    from .email_debug_views import (
+        email_debug_dashboard, send_test_email_debug, verify_user_debug, resend_verification_debug
+    )
+    DEBUG_VIEWS_AVAILABLE = True
+except ImportError:
+    DEBUG_VIEWS_AVAILABLE = False
 
 urlpatterns = [
     path('register/', UserRegistrationView.as_view(), name='user-register'),
@@ -97,14 +101,21 @@ urlpatterns = [
     path('<int:user_id>/activity-feed/', user_activity_feed, name='user-activity-feed'),
     path('leaderboard/', achievements_leaderboard, name='achievements-leaderboard'),
     
-    # Admin debug endpoints (REMOVE IN PRODUCTION!)
-    path('admin-debug/', debug_email_config, name='debug-email-config'),
-    path('admin-debug/test-email/', test_email_send, name='test-email-send'),
-    path('admin-debug/reset-cooldowns/', reset_email_cooldowns, name='reset-cooldowns'),
-    path('admin-debug/send-verification/', send_verification_debug, name='send-verification-debug'),
-    path('admin-debug/users/', list_unverified_users, name='list-unverified-users'),
-    
     # Admin setup endpoints for production deployment
     path('setup-admin/', setup_admin, name='setup-admin'),
     path('admin-status/', admin_status, name='admin-status'),
 ]
+
+# Add debug endpoints if available (for development)
+if DEBUG_VIEWS_AVAILABLE:
+    urlpatterns.extend([
+        path('admin-debug/', debug_email_config, name='debug-email-config'),
+        path('admin-debug/test-email/', test_email_send, name='test-email-send'),
+        path('admin-debug/reset-cooldowns/', reset_email_cooldowns, name='reset-cooldowns'),
+        path('admin-debug/send-verification/', send_verification_debug, name='send-verification-debug'),
+        path('admin-debug/users/', list_unverified_users, name='list-unverified-users'),
+        path('debug/dashboard/', email_debug_dashboard, name='email-debug-dashboard'),
+        path('debug/send-test-email/', send_test_email_debug, name='send-test-email-debug'),
+        path('debug/verify-user/', verify_user_debug, name='verify-user-debug'),
+        path('debug/resend-verification/', resend_verification_debug, name='resend-verification-debug'),
+    ])

@@ -229,7 +229,7 @@ class JobCreateSerializer(serializers.ModelSerializer):
             'description': {'required': True},
             'location': {'required': True},
             'job_type': {'required': True},
-            'company_email': {'required': True},
+            'company_email': {'required': False, 'allow_blank': True},
             'application_deadline': {'required': True},
             'expires_at': {'required': True},
         }
@@ -249,8 +249,13 @@ class JobCreateSerializer(serializers.ModelSerializer):
         return value.strip()
     
     def validate_company_email(self, value):
-        if not value or '@' not in value:
-            raise serializers.ValidationError("Please provide a valid company email address")
+        # Email is now optional
+        if not value:
+            return ''
+        
+        # If provided, validate it
+        if '@' not in value:
+            raise serializers.ValidationError("Please provide a valid email address")
         
         # Basic email validation
         import re

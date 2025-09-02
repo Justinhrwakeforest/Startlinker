@@ -61,7 +61,7 @@ class Job(models.Model):
     
     # Approval and posting tracking
     posted_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posted_jobs')
-    company_email = models.EmailField(blank=True, help_text="Company contact email (optional)")
+    company_email = models.EmailField(blank=True, default='', help_text="Company contact email (optional)")
     # Removed is_verified field - no longer needed
     approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_jobs')
     approved_at = models.DateTimeField(null=True, blank=True)

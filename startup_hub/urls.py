@@ -1,4 +1,5 @@
 # startup_hub/startup_hub/urls.py
+import os
 from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse
@@ -86,7 +87,7 @@ urlpatterns = [
     path('api/', api_root, name='api_root'),
 ]
 
-# Serve media files during development
-if settings.DEBUG:
+# Serve media files during development and on Render (which uses local file storage)
+if settings.DEBUG or os.environ.get('RENDER'):
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

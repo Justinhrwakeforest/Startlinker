@@ -146,10 +146,15 @@ LOGGING = {
 # SendGrid Email Configuration for Render
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
 if SENDGRID_API_KEY:
-    EMAIL_BACKEND = 'apps.users.working_sendgrid_backend.WorkingSendGridBackend'
+    # Use the main SendGrid backend consistently
+    EMAIL_BACKEND = 'apps.users.sendgrid_backend.SendGridBackend'
     DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@startlinker.com')
     EMAIL_HOST_USER = DEFAULT_FROM_EMAIL
     SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+    # Log configuration for debugging
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"SendGrid configured with EMAIL_BACKEND: {EMAIL_BACKEND}")
 else:
     # Fallback email configuration
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -159,6 +164,9 @@ else:
     EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
     DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.warning(f"SendGrid not configured, using SMTP backend: {EMAIL_HOST}")
 
 # Email verification settings
 EMAIL_VERIFICATION_SETTINGS = {

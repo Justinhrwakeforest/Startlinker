@@ -19,6 +19,10 @@ def send_gmail_friendly_verification_email(user, request=None):
     Send email verification email optimized for Gmail delivery
     Uses patterns proven to work with Gmail's filters
     """
+    logger.info(f"Starting email verification send for user: {user.email}")
+    logger.info(f"Current EMAIL_BACKEND: {settings.EMAIL_BACKEND}")
+    logger.info(f"SendGrid API Key present: {'Yes' if getattr(settings, 'SENDGRID_API_KEY', None) else 'No'}")
+    
     try:
         # Generate new verification token
         user.email_verification_token = generate_verification_token()
@@ -114,19 +118,26 @@ For support, contact: support@startlinker.com
         email.attach_alternative(html_content, "text/html")
         
         # Send the email
+        logger.info(f"Attempting to send email via {settings.EMAIL_BACKEND}")
         success = email.send(fail_silently=False)
         
         if success:
-            logger.info(f"Gmail-friendly verification email sent to {user.email}")
+            logger.info(f"✅ Gmail-friendly verification email sent successfully to {user.email}")
+            logger.info(f"Verification token: {user.email_verification_token[:10]}...")
             return True
         else:
-            logger.error(f"Failed to send verification email to {user.email}")
+            logger.error(f"❌ Failed to send verification email to {user.email} - send() returned False/0")
             return False
             
     except Exception as e:
-        logger.error(f"Error sending verification email to {user.email}: {str(e)}")
+        logger.error(f"❌ Exception while sending verification email to {user.email}")
+        logger.error(f"Exception type: {type(e).__name__}")
+        logger.error(f"Exception message: {str(e)}")
         import traceback
-        logger.error(f"Traceback: {traceback.format_exc()}")
+        logger.error(f"Full traceback:\n{traceback.format_exc()}")
+        
+        # Don't fail silently - this is critical functionality
+        # But still return False to indicate failure
         return False
 
 def is_verification_token_valid(user):

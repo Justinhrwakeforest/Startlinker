@@ -222,14 +222,14 @@ CACHES = {
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
 
-# Email configuration for production
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
-# If using AWS SES
+# Email configuration for production - Remove duplicate EMAIL_BACKEND
+# The SendGrid backend is already configured above on line 83
+# Only override if using AWS SES
 if os.environ.get('USE_AWS_SES', 'False') == 'True':
     EMAIL_BACKEND = 'django_ses.SESBackend'
     AWS_SES_REGION_NAME = AWS_S3_REGION_NAME
     AWS_SES_REGION_ENDPOINT = f'email.{AWS_S3_REGION_NAME}.amazonaws.com'
+# Otherwise keep using SendGrid backend defined above
 
 # Sentry configuration for error tracking
 SENTRY_DSN = os.environ.get('SENTRY_DSN')

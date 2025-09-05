@@ -9,6 +9,7 @@ from apps.core.health import health_check, detailed_health_check, readiness_chec
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from .sitemap_view import SitemapView
+from .robots_view import RobotsView
 
 def api_stats(request):
     from apps.startups.models import Startup
@@ -66,7 +67,8 @@ def health_check(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     
-    # Sitemap for SEO
+    # SEO Files
+    path('robots.txt', RobotsView.as_view(), name='robots'),
     path('sitemap.xml', SitemapView.as_view(), name='sitemap'),
     
     # Health check endpoints

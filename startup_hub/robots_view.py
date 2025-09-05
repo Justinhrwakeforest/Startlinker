@@ -4,7 +4,7 @@ from django.views import View
 class RobotsView(View):
     def get(self, request):
         robots_txt = """User-agent: *
-Allow: /
+Disallow:
 
 Sitemap: https://startlinker.com/sitemap.xml
 """

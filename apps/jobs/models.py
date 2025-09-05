@@ -74,6 +74,7 @@ class Job(models.Model):
     # Additional fields
     requirements = models.TextField(blank=True, help_text="Job requirements in detail")
     benefits = models.TextField(blank=True, help_text="Benefits and perks")
+    job_link = models.URLField(blank=True, max_length=500, help_text="External application link for the job")
     
     class Meta:
         ordering = ['-posted_at']

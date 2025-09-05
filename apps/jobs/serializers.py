@@ -105,7 +105,7 @@ class JobDetailSerializer(JobListSerializer):
         fields = JobListSerializer.Meta.fields + [
             'startup_detail', 'skills', 'similar_jobs', 'requirements', 'benefits',
             'requirements_list', 'benefits_list', 'posted_by_info', 'company_email',
-            'application_deadline', 'expires_at', 'can_delete', 'rejection_reason'
+            'application_deadline', 'expires_at', 'can_delete', 'rejection_reason', 'job_link'
         ]
     
     def get_startup_detail(self, obj):
@@ -222,7 +222,7 @@ class JobCreateSerializer(serializers.ModelSerializer):
         fields = [
             'title', 'description', 'startup', 'location', 'job_type', 'salary_range',
             'is_remote', 'is_urgent', 'experience_level', 'requirements', 'benefits',
-            'application_deadline', 'expires_at', 'company_email', 'skills'
+            'application_deadline', 'expires_at', 'company_email', 'skills', 'job_link'
         ]
         extra_kwargs = {
             'title': {'required': True},
